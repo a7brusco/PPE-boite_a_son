@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+
+{% block menu_sample %}active{% endblock %}
+
+
+{% block content %}
+<h3>Sample {{object.name}}</h3>
+<div style="display: flex; align-items: start; margin-top: 3rem; margin-left: 3rem;">
+    <div style="display: flex; flex-direction: column; align-items: start; margin-right: 2rem;">
+        <h4>Information : </h4>
+        <div style="display: flex; align-items: center; margin-left: 2rem; margin-bottom: 2rem;">
+            {% if sample.background.image %}
+                {% thumbnail sample.background.image "320x150" crop="center" as img %}
+                {% if sample.tag.image %}
+                    <img class="sample_tag_image" src="{{sample.tag.image.url}}" width="{{img.width}}" height="{{img.height}}" alt=" " style="border-radius:10px; background-image:url('{{img.url}}');">
+                {% else %}
+                    <img class="sample_tag_image" src="{{img.url}}" width="{{img.width}}" height="{{img.height}}" alt=" " style="border-radius:10px;">
+                {% endif %}
+                {% endthumbnail %}
+            {% else %}
+            <svg class="bd-placeholder-img" xmlns="http://www.w3.org/2000/svg" width="320" height="150" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:10px">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="#868e96"></rect>
+                <text x="50%" y="50%" fill="#dee2e6" dy="0.5em">Can't load Background Image</text>form valid
+            </svg>
+            {% endif %}
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li>Sample name : {{object.name}}</li>
+                <li>Owner : {{object.user.username}}</li>
+                <li>Created in: {{object.created_date}}</li>
+                <li>Used by : {{object.users|length}} {%if object.users|length == '0' %} creator {%else%} creator {%endif%} <span class="text-muted">(excluding owner)</span> </li>
+                <li>Status : 
+                    {% if object.isPublic %} 
+                    Public <span class="text-muted">(This sample cannot become private again or be deleted.)</span>
+                    {%else%}
+                    Private 
+                    {%endif%}
+                </li>
+                <li>Tag : {%if object.tag %} <span class="badge" style="background-color:{{sample.tag.color}}">{{sample.tag.name}}</span> {%else%} No tag yet ! {%endif%} </li>
+            </ul>
+        </div>
+        <h4>Update Information :</h4>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: flex; flex-direction: column; align-items: start;">
+                <div style="margin: 1rem 0; width: 100%;">
+                    {{ form.name|as_crispy_field}}
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    {% if not form.isPublic.value %}
+                    {{form.isPublic|as_crispy_field}}
+                    <span class="text-danger">Once public, this sample can no longer be changed to private !</span>    
+                    {% endif %}
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="tag">Change sample tag :</label>
+                    <select class="form-select shadow-none" name="tag" id="tag">
+                        {% for tag in tag_list %}
+                            {%if tag == sample.tag %}
+                            <option value="{{tag.id}}" selected>{{tag.name}}</option>
+                            {%else%}
+                            <option value="{{tag.id}}">{{tag.name}}</option>
+                            {%endif%}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save changes</button>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="updateInfo" tabindex="-1" aria-labelledby="updateInfoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateInfoLabel">Update Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div style="display: flex; flex-direction: column; align-items: start;">
+                        <div style="margin: 1rem 0; width: 100%;">
+                            {{ form.name|as_crispy_field}}
+                        </div>
+                        <div style="margin: 0.5rem 0;">
+                            {% if not form.isPublic.value %}
+                            {{form.isPublic|as_crispy_field}}
+                            <span class="text-danger">Once public, this sample can no longer be changed to private !</span>    
+                            {% endif %}
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="tag">Change sample tag :</label>
+                            <select class="form-select shadow-none" name="tag" id="tag">
+                                {% for tag in tag_list %}
+                                    {%if tag == sample.tag %}
+                                    <option value="{{tag.id}}" selected>{{tag.name}}</option>
+                                    {%else%}
+                                    <option value="{{tag.id}}">{{tag.name}}</option>
+                                    {%endif%}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block menu_sample %}active{% endblock %}
+
+{% block groupaction %}
+<div>
+    <div class="btn-toolbar mt-3 float-end" role="toolbar" aria-label="sample list toolbar" style="padding: 0 .75rem;"> 
+        <div class="btn-group me-3" role="group">
+            <a class="btn btn-outline-secondary btn-outline-secondary-perso" data-bs-toggle="modal" data-bs-target="#formModalCreateProject">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class ="row row-cols-2-sm" >
+    {% for project in object_list %}
+        <div class="col col-lg-3 mx-auto p-3" style="min-width: 270px;"> 
+            <div class="card-project card-margin bg-dark border-secondary">
+                <div class="card-header-project no-border">
+                    <h5 class="card-title">{{project.name|upper}}</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="widget-49">
+                        <div class="widget-49-title-wrapper">
+                            <div class="widget-49-date-primary">
+                                <span class="widget-49-date-day">{{project.created_date.day}}</span>
+                                <span class="widget-49-date-month">{{project.month_name}}</span>
+                            </div>
+                            <div class="widget-49-meeting-info">
+                                <span class="widget-49-pro-title">{{project.fileName}}</span>
+                                <span class="widget-49-meeting-time">{{project.typeOfMusic}}</span>
+                            </div>
+                        </div>
+                        <ol class="widget-49-meeting-points">
+                            <li class="widget-49-meeting-item"><span>Number of channels : {{project.nbOfChannels}}</span></li>
+                            <li class="widget-49-meeting-item"><span>Number of musical time : {{project.nbOfTime}}</span></li>
+                            <li class="widget-49-meeting-item"><span>Beats per minute : {{project.bpm}}</span></li>
+                        </ol>
+                        <div class="widget-49-meeting-action">
+                            <a class="btn btn-sm" onclick="downloadFile(this, '{{project.file}}')" name="{{project.file.url}}" >Download</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="modal fade" id="formModalCreateProject" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Create Project</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="formCreateProject" action="{% url 'project_create' %}" method="post" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate >
+          {% csrf_token %}
+          <div class="modal-body divCreate">
+            <div class="col-12 mb-3">
+                <label id="labelNameOfProject" for="name" class="form-label">Name*</label>
+                <input type="text" class="form-control" id="nameOfProjectCreate" required name="name" minlength="3" maxlength="15">
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    This name have less than 3 characters.
+                </div>
+            </div>
+            <div class="col-12">
+                <label id="labelTypeOfProject" for="TypeOfProject" class="form-label">Type of music</label>
+                <input type="text" class="form-control" id="TypeOfProject" required name="typeOfMusic" minlength="0" maxlength="10">
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    This name have more than 10 characters.
+                </div>
+            </div>
+            <div class="col-12 mb-3">
+                <label id="labelFileOfProject" for="file" class="form-label">File*</label>
+                </br>
+                <input type="file" class="form-control" id="fileOfProjectCreate" name="file" accept="application/JSON" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Your file is empty or is not ajson file.
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" type="submit" id="buttonDismissCreateProject" onclick="spinner()">Create Project</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function downloadFile(e, projectFile){
+        var name = projectFile.split("/");
+        name = name[name.length-1];
+        fetch(e.name).then(r=>r.json()).then(file=>{
+            var datastr = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(file));
+            var a = document.createElement("a");
+            a.setAttribute('href', datastr);
+            a.setAttribute("download", name);
+            a.click()
+            a.remove();
+        })
+    }
+
+    function spinner(){
+      var body = document.querySelector('body')
+      var newDiv = document.createElement("DIV");
+      newDiv.style.cursor = "wait";
+      newDiv.style.position  ="absolute";
+      newDiv.style.top = "0";
+      newDiv.style.left = "0";
+      newDiv.style.zIndex = "1070";
+      newDiv.style.height = "100vh";
+      newDiv.style.width = "100%";
+      newDiv.setAttribute("id", "temporaryDiv");
+      body.appendChild(newDiv);
+      setTimeout(()=>{document.getElementById("temporaryDiv").remove()}, 6000);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+<div class="d-none">
+    <form method="POST" enctype="multipart/form-data" id="createKitFromColl" action="{% url 'createKitFromColl' %}">
+        {% csrf_token %}
+        <select form="createKitFromColl" required id="sampleList" name="sampleList" multiple>
+            {% for sample in allSamples %}
+                <option value="{{sample.id}}">{{sample.name}}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>

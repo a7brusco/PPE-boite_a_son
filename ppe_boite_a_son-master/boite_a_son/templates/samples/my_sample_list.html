@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block menu_sample %}active{% endblock %}
+
+{% block groupaction %}
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+    <form method="GET" class="form-control" style="background-color: transparent !important; border: none;">
+        <div class="input-group">
+            <div class="btn-group mb-3" role="group" aria-label="Basic radio toggle button group" style="width: 100%;">  
+                {% if macro %}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro" checked/>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio1"  onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio2" onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {%else%}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro"/>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio1" for="btnradio1" onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio2"  onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {% endif %}
+            </div>
+            <div class="input-group mx-auto">
+                <input class="form-control form-control-filter  text-white" placeholder="Sample name, artist or tags ..." type="text" id="id_filter_by_all" name="filter_by_all" value="{{ request.GET.filter }}" style="background-color: var(--btn-outline-color); border-top-right-radius: 0; border-bottom-right-radius: 0; height: 38px;">
+                <div class="position-relative">
+                    <select class="w-100" id='filterAll' name="filter_selection" multiple>
+                        <title></title>
+                        <g id="icomoon-ignore">
+                        </g>
+                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                        </svg>;">
+                        {% if filter_name %}
+                        <option value='name' selected>Name</option>
+                        {% else %}
+                        <option value='name'>Name</option>
+                        {% endif %}
+                        {% if filter_user %}
+                        <option value='artist' selected>Artist</option>
+                        {% else %}
+                        <option value='artist'>Artist</option>
+                        {% endif %}
+                        {% if filter_tag %}
+                        <option value='tags' selected>Tags</option>
+                        {% else %}
+                        <option value='tags' >Tags</option>
+                        {% endif %}
+                    </select>
+                    <script>
+                        document.multiselect('#filterAll');
+                    </script>
+                </div>
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>  
+</div>
+<div class="ms-3">
+    {% if length is not None %}
+        <em>{{ length }} results founds</em>
+    {% endif %}
+</div>
+<div>
+    <div class="btn-toolbar mt-3 float-end" role="toolbar" style="padding: 0 .75rem;"> 
+        <div class="btn-group me-3" role="group">
+            <a type="button" id="btn-delete" class="btn btn-danger d-none" data-bs-toggle="modal" data-bs-target="#formModal" onclick="sendInfoToModal('{{path}}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+            </a>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary btn-outline-secondary-perso dropdown-toggle d-none" data-bs-toggle="dropdown" aria-expanded="false" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
+                        <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
+                        <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
+                    </svg>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                    <li><a id="tag-delete" class="dropdown-item text-white" href="#">Clear All Tags</a></li>
+                    <li><hr class="dropdown-divider" style="border-color: var(--color);"></li>
+                    {%for tag in tag_list %}
+                    <li><a class="dropdown-item tag-item text-white" href="#"  data-id="{{tag.id}}">Add <span class="badge" style="background-color:{{tag.color}}">{{tag.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop2" type="button" class="btn btn-outline-secondary btn-outline-secondary-perso dropdown-toggle d-none" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                    </svg>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop2">
+                    <li><a id="collection-delete" class="dropdown-item" href="#" style="color: var(--color)">Remove from All Collections</a></li>
+                    <li><hr class="dropdown-divider" style="border-color: var(--color);"></li>
+                    {%for collection in collection_list %}
+                    <li><a class="dropdown-item" href="#" style="color: var(--color)" data-bs-toggle="modal" data-bs-target="#addToColl" onclick="transferDataId('{{collection.id}}')">Add to {{collection.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="btn-group me-3" role="group">
+            <a class="btn btn-outline-secondary-perso btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#formModalCreateSample">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+            </a>
+        </div>
+        <div class="btn-group me-3" role="group">
+            <a class="btn btn-primary" onclick="createKitFromSample()">Start Sequencer</a>
+        </div>
+    </div>
+</div>
+
+{% include "samples/sampleItems/modal_sample_create.html" %}
+{% include "samples/sampleItems/form_create_kit_sample.html" %}
+
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Delete Samples To My Samples</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+              <table class="table dataTable-table" id ="SampleSelectedTable" >
+                <thead style="color: var(--color);">
+                    <tr >
+                    <th class="col-1 text-center">Select</th>
+                    <th class="col-2 text-center">Player</th>
+                    <th class="col-3 text-center">Name</th>
+                    <th class="col-1 text-center">Artist</th>
+                    <th class="col-3 text-center">Tags</th>
+                    <th class="col-2 text-center">Last Modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" data-bs-dismiss="modal" onclick="changeDataServer('{{path}}')">Delete to my Samples</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteCompletelySample" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Delete completely this sample</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+            <p>Voulez vous supprimer définitivement ce sample ?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" data-bs-dismiss="modal" onclick="definitiveDeleteSample()">Delete</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addToColl" tabindex="-1" aria-labelledby="addToCollLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color);">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addToCollLabel">Validation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-danger">Be warned : by adding private samples to a public collection, you'll change them into public samples.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="#" class="btn btn-primary collection-item" data-id="">Ok !</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                Your sample has been created ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="deleteToMySampleToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                This samples are successfully deleted to your samples ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div id="mySamplesList">
+{% include "samples/sampleItems/sample_list_item.html" %}   
+</div>
+
+{% endblock %}
+
+{% block js%}
+ <script>
+    SHOW_EDIT_TAGS = false;
+    SAMPLE_CHOOSEN = null;
+    SAMPLE_TO_DELETE = null
+
+    function modalDefinitiveDeleteSample(id){
+        SAMPLE_TO_DELETE = id;
+        var modalDelete = document.getElementById("modalDeleteCompletelySample");
+        var modal = new bootstrap.Modal(modalDelete);
+        modal.show();
+    }
+     
+
+    if("{{created}}"==="True"){
+        showToastCreated(); 
+    }
+
+    var render = function() {
+        selected_rows = get_selected_rows(btn_required_selected=["btn-delete", "btnGroupDrop2"]);
+        if (SHOW_EDIT_TAGS===true){
+            document.getElementById("btnGroupDrop1").classList.remove('d-none');
+        }
+        else {
+            document.getElementById("btnGroupDrop1").classList.add('d-none');
+        }
+        if (selected_rows.length > 0)
+        {
+            var query_string = "ids="+selected_rows.toString();
+            set_href("tag",query_string);
+            set_href("collection",query_string)
+            SAMPLE_CHOOSEN = selected_rows.toString().split(",").map(function(item) {
+            return parseInt(item, 10);});
+            document.getElementById('btn-delete').setAttribute("href","delete?"+query_string);
+        }
+        else{
+            SAMPLE_CHOOSEN = null;
+        }
+    };
+
+    init_table_ui("#SampleTable",render);
+
+    function definitiveDeleteSample(){
+        let csrfValue = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch("{{request.path}}", {
+        method:"POST",
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrfValue,
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({'post_data_delete' : SAMPLE_TO_DELETE}),
+        }).then(response => response.json()).
+        then(function(data){
+            if (data.type === "deleteFromMySamples"){
+                var sampleDiv  = document.querySelector('#mySamplesList');
+                sampleDiv.innerHTML = data.sample_list;
+                var toastEl = document.getElementById('deleteToMySampleToast');
+            }
+            else{
+                var toastEl = document.getElementById('addToMySampleToast');
+            }
+            toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        })
+        .catch(err => {
+        // gestion des erreurs
+        });
+        var cards = document.querySelectorAll("a[checked='true']");
+        for (var i = 0; i < cards.length; i++) { 
+            cards[i].setAttribute("checked", "false");
+        }
+        SHOW_EDIT_TAGS = false;
+        render();
+    }
+
+    function createKitFromSample() {
+        if (SAMPLE_CHOOSEN==null) {
+            window.open('https://sequenceur-firebase.web.app/', target='_blank');
+        } else {
+            let csrfValue = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            let form = document.getElementById('createKitFromSample');
+            let select = document.getElementById('sampleList');
+            for (let i = 0; i < select.children.length; i++) {
+                const option = select.children[i];
+                SAMPLE_CHOOSEN.forEach(sampleId => {
+                    if (option.value==sampleId) {
+                        option.setAttribute('selected',true);
+                    }
+                });
+            }
+            let data = new FormData(form);
+            fetch("{% url 'createKitFromSample' %}", {
+                method: 'POST',
+                body: data,
+            }).then(response => response.json())
+            .then(data => {
+                window.open('https://sequenceur-firebase.web.app/initKit/'+data.kitId, target='_blank') //penser à verifier l'url sur vue (et donc lancer vue) http://localhost:8080/initKit/ ou https://sequenceur-firebase.web.app/initKit/
+            })
+        }
+    }
+
+    function transferDataId(id) {
+        var a = document.querySelector('.collection-item');
+        var href=a.getAttribute("href");
+        var tmp = href.split('/');
+        var url = tmp[0]+"/"+id+tmp[1];
+        a.setAttribute('href', url);
+    }
+</script>
+{% endblock %}

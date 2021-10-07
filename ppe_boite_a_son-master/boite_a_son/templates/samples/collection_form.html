@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+
+{% block menu_collection %}active{% endblock %}
+
+{% block breadcrumb %}
+
+{% endblock %}
+
+
+{% block content %}
+    <h2>{{type}} Collection : {{object.name}}</h2>
+    <div style="display: flex; align-items: center; margin-left: 2rem;">
+        <form action="{% url 'newCollectionImage' object.id %}" method="POST" enctype="multipart/form-data" id="newCollectionImage" style=" margin-right: 2rem; ">
+            {% csrf_token %}
+            <input type="hidden" name="redirect" value="{{request.path}}"/>
+            <label class="form-control-label" for="collectionImageInput" style="height: 450px; margin-top:2rem">
+                {% if object.image %}
+                    {% thumbnail object.image "300x450" crop="center" as img %}
+                    <img class="image" src="{{img.url}}" width="100%" height="100%" style="border-radius:7px; cursor: pointer;" id="collectionImage">
+                    {% endthumbnail %}
+                {% else %}
+                    <svg class="bd-placeholder-img image" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:7px; cursor: pointer;" id="collectionImage">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#868e96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em">No Image</text>
+                    </svg>
+                {% endif %}
+            </label>
+            <input class="form-control-file" accept="image/*" type="file" name="image" id="collectionImageInput" style="display: none">
+        </form>
+        <form method="post" action="#" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: flex; align-items: center; margin-top: 2rem;">
+                {{ form.name|as_crispy_field}}
+                {% if not form.isPublic.value %}
+                <div style="display: flex; flex-direction: column; padding: 1.5rem 0 0 2rem;">
+                    <div style="display: flex; align-items: center;">
+                        {{form.isPublic|as_crispy_field}}
+                        <span class="text-danger">&nbsp (une fois public la collection ne pourra plus être repassée en privée !)</span>
+                    </div>
+                    <span class="text-danger">Attention : tous les samples privées de cette collection deviendront publiques</span>
+                </div>
+                {% endif %}
+            </div>
+            <div style="display: flex; align-items: center; margin-top: 2rem;">
+                <div style="width: 75rem;">
+                    {{ form.description|as_crispy_field}}
+                </div>
+            </div>
+            <button class="btn btn-primary float-end mt-3" type="submit">Update</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.getElementById('collectionImageInput').addEventListener("change", function(){
+        var newCollectionImage=document.getElementById('newCollectionImage');
+        newCollectionImage.submit();
+    });
+</script>
+{% endblock %}

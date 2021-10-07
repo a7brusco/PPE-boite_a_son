@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block groupaction %}
+<h1>{{object.user.get_full_name}}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <div class="row border-bottom pb-3">
+        <div class="col-2 my-auto mx-4">
+            <form action="{% url 'newProfileImage' object.id %}" method="POST" enctype="multipart/form-data" id="newImageForm">
+                {% csrf_token %}
+                <input type="hidden" name="redirect" value="{{request.path}}"/>
+                <label class="form-control-label" for="profileImageInput">
+                    <img class="rounded-circle image ms-3" src="{{object.image.url}}" style="width: 200px; cursor: pointer;" id="profileImage">
+                </label>
+                <input class="form-control-file" accept="image/*" type="file" name="image" id="profileImageInput" style="display: none">
+            </form>
+        </div>
+        <div class="col my-auto">
+            <form action="{% url 'changeUserInfo' user.id %}" method="POST" enctype="multipart/form-data" class="row needs-validation" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="redirect" value="{{request.path}}"/>
+                <div class="col-3 me-5">
+                    <div class="row mb-3">
+                        <label for="validationCustomUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" name="username" value="{{request.user.username}}" required>
+                        <div class="invalid-feedback">This field is required !</div>
+                    </div>
+                </div>
+                <div class="col-3 me-5">
+                    <div class="row mb-3">
+                        <label for="validationCustomFisrtName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="validationCustomFisrtName" placeholder="First name" name="first_name" aria-label="First name" value="{{request.user.first_name}}">
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row mb-3">
+                        <label for="validationCustomLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="validationCustomLastName" placeholder="Last name" name="last_name" aria-label="Last name" value="{{request.user.last_name}}">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-3 me-5">
+                        <label for="validationCustomEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="validationCustomEmail" name="email" value="{{request.user.email}}" placeholder="name@example.com" aria-describedby="emailHelp" required>
+                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                        <div class="invalid-feedback">This field is required !</div>
+                    </div>
+                    <div class="col-3 my-auto">
+                        Password : <a href="{% url 'changePassword' user.id %}" type="button" class="btn btn-primary">Change Password</a>
+                    </div>
+                </div>
+                <div class="row position-relative">
+                    <button class="btn btn-primary position-absolute end-0 bottom-0" name="saveUserForm" type="submit" style="width: 60px;">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row border-bottom pb-3 mt-4">
+        <h2>Personal Infos</h2>
+        <form class="mt-4" action="{% url 'profile' object.id %}" method="POST" enctype="multipart/form-data" id="changeProfileInfo">
+            {% csrf_token %}
+            <input type="hidden" name="redirect" value="{{request.path}}"/>
+            <div class="row">
+                <div class="col-7 me-4">
+                    <label for="profileBio" class="form-label">Bio</label>
+                    <textarea class="form-control" id="profileBio" style="height: 116px;" name="bio" placeholder="Tell something about you...">{{request.user.profile.bio}}</textarea>
+                </div>
+                <div class="col-3">
+                    <div class="row mb-2">
+                        <label for="favMusicSoftware" class="form-label">Favorite Music Software</label>
+                        <input type="text" class="form-control" list="datalistOptions" id="favMusicSoftware" name="favMusicSoftware" placeholder="Type to search..." value="{{request.user.profile.favMusicSoftware}}">
+                        <datalist id="datalistOptions">
+                            <option value="FL Studio">
+                            <option value="Ableton">
+                            <option value="Logic Pro">
+                            <option value="REAPER">
+                            <option value="GarageBand">
+                            <option value="LMMS">
+                        </datalist>
+                    </div>
+                    <div class="row">
+                        <label for="musicStyle" class="form-label">Favorite Music Style</label>
+                        <input type="text" class="form-control" id="musicStyle" placeholder="Rap, Rock, EDM..." name="musicStyle" value="{{request.user.profile.musicStyle}}">
+                    </div>
+                </div>
+            </div>
+            <div class="row position-relative">
+                <button class="btn btn-primary position-absolute end-0 bottom-0" name="saveProfileForm" type="submit" style="width: 60px;" >Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.getElementById('profileImageInput').addEventListener("change", function(){
+        var newImageForm=document.getElementById('newImageForm');
+        newImageForm.submit();
+    });
+
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+        })
+    })()
+</script>
+{% endblock %}

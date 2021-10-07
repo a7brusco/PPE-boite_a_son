@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block menu_collection %}active{% endblock %}
+
+
+{% block groupaction %}
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+  
+    <form method="GET" class="form-control" style="background-color: transparent !important; border: none;">
+        <div class="input-group mx-auto">
+            <input class="form-control form-control-filter  text-white" placeholder="Sample name or artist..." type="text" id="id_filter_by_all" name="filter_by_all" value="{{ request.GET.filter }}" style="background-color: var(--btn-outline-color); border-top-right-radius: 0; border-bottom-right-radius: 0; height: 38px;">
+            <div class="position-relative">
+                <select class="w-100" id='filterAll' name="filter_selection" multiple>
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                    </svg>;">
+                    {% if filter_name %}
+                    <option value='name' selected>Name</option>
+                    {% else %}
+                    <option value='name'>Name</option>
+                    {% endif %}
+                    {% if filter_user %}
+                    <option value='artist' selected>Artist</option>
+                    {% else %}
+                    <option value='artist'>Artist</option>
+                    {% endif %}
+                </select>
+                <script>
+                    document.multiselect('#filterAll');
+                </script>
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>  
+</div>
+<div class="ms-3">
+    {% if length is not None %}
+        <em>{{ length }} results founds</em>
+    {% endif %}
+</div>
+<div>
+    <div class="btn-toolbar mt-3 float-end" role="toolbar"style="padding: 0 .75rem;"> 
+        <div class="btn-group me-3" role="group">
+            <a id="btn-delete" class="btn btn-danger d-none" data-bs-toggle="modal" data-bs-target="#formModalDeleteCollections" onclick="sendInfoToModalCollection('{{request.path}}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+            </a>
+        </div>
+        <div class="btn-group me-3" role="group">
+            <a class="btn btn-outline-secondary btn-outline-secondary-perso" data-bs-toggle="modal" data-bs-target="#formModalCreateCollection">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+            </a>
+        </div>
+        <div class="btn-group me-3" role="group">
+            <a class="btn btn-primary" onclick="createKitFromColl()">Start Sequencer</a>
+        </div>
+    </div>
+</div>
+
+{% include "samples/sampleItems/form_create_kit_coll.html" %}
+
+<div class="modal fade" id="formModalCreateCollection" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Create Collection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="formCreate" action="{% url 'my_collection_create' %}" method="post" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate >
+        {% csrf_token %}
+          <div class="modal-body divCreate">
+                <div class="col-12 mb-3">
+                    <label id="labelNameOfCollection" for="name" class="form-label">Name*</label>
+                    <input type="text" class="form-control" id="nameOfCollectionCreate" required name="name" minlength="4" maxlength="20">
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        This name have less than 4 characters.
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <label id="labelDescriptionOfCollection" for="description" class="form-label">Description*</label>
+                    <textarea class="form-control" id="descriptionOfCollectionCreate" required name="description" minlength="4" maxlength="200" style="resize: none; height: 150px;"></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        This description have less than 4 characters.
+                    </div>
+                </div>
+                <div class="col-12">
+                    <input type="checkbox" class="form-control-input" id="collectionCreateIsPublic" name="isPublic">
+                    <label id="labelNameOfSample" for="collectionCreateIsPublic" class="form-label">Public Collection ? <span class="text-danger">(une fois public la collection ne pourra plus être repassée en privé !)</span></label>
+                </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" type="submit" id="buttonDismissCreateSample">Create Collection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+<div class="modal fade" id="formModalDeleteCollections" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Delete Collections To My Collections</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+              <table class="table dataTable-table" id ="CollectionSelectedTable" >
+                <thead style="color: var(--color);">
+                    <tr >
+                    <th class="col-1 text-center">Select</th>
+                    <th class="col-2 text-center">Name</th>
+                    <th class="col-3 text-center">Color</th>
+                    <th class="col-1 text-center">Artist</th>
+                    <th class="col-3 text-center">Nb samples</th>
+                    <th class="col-3 text-center">Description</th>
+                    <th class="col-2 text-center">Last Modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" data-bs-dismiss="modal" onclick="changeDataCollections('{{request.path}}')">Delete to My Collections</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteCompletelyCollection" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Delete completely this collection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+            <p>Voulez vous supprimer définitivement cette collection ?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" data-bs-dismiss="modal" onclick="definitiveDeleteCollection()">Delete</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                Your collection has been created ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="deleteToMyCollectionToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                This collections are successfully deleted to your samples ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div id="myCollection">
+{% include "samples/sampleItems/collection_list_item.html" %}
+</div>
+{% endblock %}
+
+{% block js%}
+ <script>
+    COLLECTION_CHOOSEN= null;
+    COLLECTION_TO_DELETE = null
+
+    function modalDefinitiveDeleteCollection(id){
+        COLLECTION_TO_DELETE = id;
+        var modalDelete = document.getElementById("modalDeleteCompletelyCollection");
+        var modal = new bootstrap.Modal(modalDelete);
+        modal.show();
+    }
+
+
+
+    if("{{created}}"==="True"){
+       showToastCreated(); 
+    }
+
+    var render = function() {
+        selected_rows = get_selected_rows(btn_required_selected=["btn-delete"])
+        
+        if (selected_rows.length > 0)
+        {
+            var query_string = "ids="+selected_rows.toString();
+            COLLECTION_CHOOSEN = selected_rows.toString().split(",").map(function(item) {
+            return parseInt(item, 10);});
+        }
+    };
+
+    function definitiveDeleteCollection(){
+        let csrfValue = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch("{{request.path}}", {
+        method:"POST",
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrfValue,
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({'post_data_delete' : COLLECTION_TO_DELETE}),
+        }).then(response => response.json()).
+        then(function(data){
+            if (data.type === "deleteFromMyCollections"){
+                var sampleDiv  = document.querySelector('#myCollection');
+                sampleDiv.innerHTML = data.collection_list;
+                var toastEl = document.getElementById('deleteToMyCollectionToast');
+            }
+            toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        })
+        .catch(err => {
+        // gestion des erreurs
+        });
+        var cards = document.querySelectorAll("a[checked='true']");
+        for (var i = 0; i < cards.length; i++) { 
+            cards[i].setAttribute("checked", "false");
+        }
+        render();
+    }
+
+    
+    init_table_ui("#CollectionTable",render);
+
+    function createKitFromColl() {
+        if (COLLECTION_CHOOSEN==null) {
+            window.open('https://sequenceur-firebase.web.app/', target='_blank');
+        } else {
+            let csrfValue = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            fetch('{% url "collection_list_api" %}', {
+                method:'POST',
+                credentials:'same-origin',
+                headers:{
+                    'X-CSRFToken': csrfValue,
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({'collecId':COLLECTION_CHOOSEN})
+            }).then(response => response.json())
+            .then(data => {
+                let listOfId = data.listOfId;
+                let form = document.getElementById('createKitFromColl');
+                let select = document.getElementById('sampleList');
+                for (let i = 0; i < select.children.length; i++) {
+                    const option = select.children[i];
+                    listOfId.forEach(sampleId => {
+                        if (option.value==sampleId) {
+                            option.setAttribute('selected',true);
+                        }
+                    });
+                }
+                let formData = new FormData(form);
+                fetch("{% url 'createKitFromColl' %}", {
+                    method:'POST',
+                    body:formData,
+                }).then(response => response.json())
+                .then(obj => {
+                    window.open('https://sequenceur-firebase.web.app/initKit/'+obj.kitId, target='_blank') //penser à verifier l'url sur vue (et donc lancer vue) http://localhost:8080/initKit/ ou https://sequenceur-firebase.web.app/initKit/
+                })
+            })
+        }
+    }
+
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block menu_collection %}active{% endblock %}
+
+
+{% block content %}
+<form method="post" action="#">
+    <h2>Add Collections To My Collections</h2>
+        <table class="table" id ="CollectionTable" style="color: ghostwhite;">
+            <thead>
+                <tr>
+                <th class="col-1 text-center">Select</th>
+                <th class="col-2 text-center">Name</th>
+                <th class="col-1 text-center">Color</th>
+                <th class="col-2 text-center">Artist</th>
+                <th class="col-1 text-center">Nb Samples</th>
+                <th class="col-3 text-center">Description</th>
+                <th class="col-2 text-center">Last Modification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for collection in object_list %}
+                <tr>
+                    <td class="text-center align-middle"><input class="form-check-input row_selector" type="checkbox" data-id="{{collection.id}}" id="{{collection.id}}" checked disabled></td>
+                    <td class="text-center align-middle">{{collection.name}}</td>
+                    <td class="text-center align-middle"><input type="color" class="form-control form-control-sm mx-auto form-control-color"  value="{{collection.color}}" disabled> </td>
+                    <td class="text-center align-middle">{{collection.user.username}}</td>
+                    <td class="text-center align-middle">{{collection.samples.count}}</td>
+                    <td class="text-center align-middle">{{collection.description}}</td>
+                    <td class="text-center align-middle">{{collection.created_date}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    {% csrf_token %}
+    {{ form| crispy }}
+    <input type="submit" class="btn btn-success btn-submit" value="save" />
+</form>
+{% endblock %}

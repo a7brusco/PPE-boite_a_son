@@ -1,0 +1,288 @@
+{% load static %}
+{% load thumbnail %}
+<div class ="row row-cols-3-sm">
+    {% for sample in object_list %}
+        {% if sample.isMacro %}
+            {% if macro %}
+                <div class="col-lg-4 mx-auto p-3 macro">
+            {% else %}
+                <div class="col-lg-4 mx-auto p-3 macro d-none">
+            {% endif %}
+            <div class="card bg-dark border-secondary" style="width: 100%;">
+                {% if sample.background.image %}
+                    {% thumbnail sample.background.image "520x150" crop="center" as img %}
+                    {% if sample.tag.image %}
+                        <img class="sample_tag_image" src="{{sample.tag.image.url}}" width="100%" height="{{img.height}}" alt=" " style="border-radius:10px 10px 0 0; background-image:url('{{img.url}}');">
+                    {% else %}
+                        <img class="sample_tag_image" src="{{img.url}}" width="100%" height="{{img.height}}" alt=" " style="border-radius:10px 10px 0 0;">
+                    {% endif %}
+                    {% endthumbnail %}
+                {% else %}
+                <svg class="bd-placeholder-img" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:7px 7px 0 0;">
+                    <title>Placeholder</title>
+                    <rect width="100%" height="100%" fill="#868e96"></rect>
+                    <text x="50%" y="50%" fill="#dee2e6" dy="1em">Can't load Background Image</text>form valid
+                </svg>
+                {% endif %}
+                <div class="card-img-overlay h-100">
+                    <a class="card-button" style="position: absolute; height: 100%; width: 100%; display: inline-block; margin-left: -1rem; margin-top: -1rem; cursor: pointer;" id="{{sample.id}}" data-id="{{sample.id}}" checked="false" author="{{sample.user}}" onClick='selectCard("{{sample.id}}", "{{user}}")'></a>
+                    <div style="color: ghostwhite;">
+                        <h5 class="card-title">{{sample.name}}
+                            {% if sample.isRecent %}
+                            <span class="badge bg-danger mb-2 ms-2 rounded-pill">New</span>
+                            {% endif %}
+                        </h5>
+                        <h6 class="card-subtitle mb-2">
+                            <em>{{sample.user.username}}</em>
+                            {% if sample.user.id == user.id %}
+                            <span class="badge rounded-pill bg-success">Owner</span>
+                            {% endif %}
+                            {% if not sample.isPublic %}
+                            <span class="badge rounded-pill bg-danger">Private</span>
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="margin-bottom: 1rem;">
+                        <p class="mt-1">Tag :
+                        {% if sample.tag %}
+                            <span class="badge mb-2" style="background-color:{{sample.tag.color}}">{{sample.tag.name}}</span>
+                        {% else %}
+                            <em>This Sample has no Tag yet !</em>
+                        {% endif %}
+                        </p>  
+                    </div>
+                    <div class="mt-1" style="z-index: 1; position: relative;">
+                        <audio controls preload=metadata volume=1 class="player" style="width:100%;"><source src="{{sample.file.url}}"></audio>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col-9 mt-2">
+                            Created date : {{sample.created_date}}
+                        </div>
+                        <div class="col-3">
+                            {% if 'recents' in request.path %}
+                            <a class="btn btn-primary float-end" href="{% url 'recents_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem;">More</a>
+                            {% elif 'samples' in request.path and 'mysamples' not in request.path%}
+                            <a class="btn btn-primary float-end" href="{% url 'sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem;">More</a>
+                            {% elif 'mysamples' in path %}
+                                {% if sample.user.id == user.id %}
+                                    <div class="dropdown" style="margin: 0 !important ;">
+                                        <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"  style="padding: 0.1rem; z-index:1 ; position: relative; width: 5rem; height: 35.6px; font-size: 16px;">
+                                        More
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-card" aria-labelledby="dropdownMenuButton1">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'my_sample_detail' sample.id %}">
+                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"  style="fill: #898989; margin-right: 5px;">
+                                                    <title></title>
+                                                    <g id="icomoon-ignore">
+                                                    </g>
+                                                    <path d="M480 0h32v368c0 44.183-50.145 80-112 80s-112-35.817-112-80c0-44.184 50.145-80 112-80 31.342 0 59.671 9.2 80 24.020v-184.020l-256 56.889v247.111c0 44.183-50.144 80-112 80s-112-35.817-112-80c0-44.184 50.144-80 112-80 31.342 0 59.671 9.2 80 24.020v-312.020l288-64z"></path>
+                                                </svg>
+                                                Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'mysample_update' sample.id %}">
+                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" style="fill: #898989; margin-right: 5px;">
+                                                    <title></title>
+                                                    <g id="icomoon-ignore">
+                                                    </g>
+                                                    <path d="M432 0c44.182 0 80 35.817 80 80 0 18.010-5.955 34.629-16 48l-32 32-112-112 32-32c13.371-10.045 29.989-16 48-16zM32 368l-32 144 144-32 296-296-112-112-296 296zM357.789 181.789l-224 224-27.578-27.578 224-224 27.578 27.578z"></path>
+                                                </svg>
+                                                
+                                                Update Information
+                                            </a>
+                                        </li>
+                                        {% if not sample.isPublic %}
+                                        <li>
+                                            <a class="dropdown-item text-danger" onclick="modalDefinitiveDeleteSample('{{sample.id}}')" style="cursor: pointer;" >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 5px;">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                </svg> 
+                                                Delete Completely
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                        </ul>
+                                    </div>
+                                    {% else %}
+                                        <a class="btn btn-primary float-end" href="{% url 'my_sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 5rem; font-size: 16px;">More</a>
+                                {% endif %}                               
+                            {% endif %}                   
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        {% else %}
+            {% if macro %}
+                <div class="col-lg-4 mx-auto p-3 micro d-none">
+            {% else %}
+                <div class="col-lg-4 mx-auto p-3 micro">
+            {% endif %}
+            <div class="card bg-dark border-secondary" style="width: 100%;">
+                {% if sample.background.image %}
+                    {% thumbnail sample.background.image "520x150" crop="center" as img %}
+                    {% if sample.tag.image %}
+                        <img class="sample_tag_image" src="{{sample.tag.image.url}}" width="100%" height="{{img.height}}" alt=" " style="border-radius:10px 10px 0 0; background-image:url('{{img.url}}');">
+                    {% else %}
+                        <img class="sample_tag_image" src="{{img.url}}" width="100%" height="{{img.height}}" alt=" " style="border-radius:10px 10px 0 0;">
+                    {% endif %}
+                    {% endthumbnail %}
+                {% else %}
+                <svg class="bd-placeholder-img" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:7px 7px 0 0;">
+                    <title>Placeholder</title>
+                    <rect width="100%" height="100%" fill="#868e96"></rect>
+                    <text x="50%" y="50%" fill="#dee2e6" dy="1em">Can't load Background Image</text>form valid
+                </svg>
+                {% endif %}
+                <div class="card-img-overlay h-100">
+                    <a class="card-button" style="position: absolute; height: 100%; width: 100%; display: inline-block; margin-left: -1rem; margin-top: -1rem; cursor: pointer;" id="{{sample.id}}" data-id="{{sample.id}}" checked="false" author="{{sample.user}}" onClick='selectCard("{{sample.id}}", "{{user}}")'></a>
+                    <div style="color: ghostwhite;">
+                        <h5 class="card-title">{{sample.name}}
+                            {% if sample.isRecent %}
+                            <span class="badge bg-danger mb-2 ms-2 rounded-pill">New</span>
+                            {% endif %}
+                        </h5>
+                        <h6 class="card-subtitle mb-2">
+                            <em>{{sample.user.username}}</em>
+                            {% if sample.user.id == user.id %}
+                            <span class="badge rounded-pill bg-success">Owner</span>
+                            {% endif %}
+                            {% if not sample.isPublic %}
+                            <span class="badge rounded-pill bg-danger">Private</span>
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="margin-bottom: 1rem;">
+                        <p class="mt-1">Tag :
+                        {% if sample.tag %}
+                            <button class="btn btn-primary badge" type="radio" style="background-color:{{sample.tag.color}}; cursor: pointer; position: relative; z-index: 1;" onclick='selectTag("{{sample.id}}","{{sample.tag.id}}")'>{{sample.tag.name}}</button>
+                        {% else %}
+                            <em>This Sample has no Tag yet !</em>
+                        {% endif %}
+                        </p>  
+                    </div>
+                    <div class="mt-1" style="z-index: 1; position: relative;">
+                        <audio controls preload=metadata volume=1 class="player" style="width:100%;"><source src="{{sample.file.url}}"></audio>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col-9 mt-2">
+                            Created date : {{sample.created_date}}
+                        </div>
+                        <div class="col-3">
+                            {% if 'recents' in request.path %}
+                            <a class="btn btn-primary float-end" href="{% url 'recents_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem;">More</a>
+                            {% elif 'samples' in request.path and 'mysamples' not in request.path%}
+                            <a class="btn btn-primary float-end" href="{% url 'sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem;">More</a>
+                            {% elif 'mysamples' in path %}
+                                {% if sample.user.id == user.id %}
+                                    <div class="dropdown" style="margin: 0 !important ;">
+                                        <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"  style="padding: 0.1rem; z-index:1 ; position: relative; width: 5rem; height: 35.6px; font-size: 16px;">
+                                        More
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-card" aria-labelledby="dropdownMenuButton1">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'my_sample_detail' sample.id %}">
+                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"  style="fill: #898989; margin-right: 5px;">
+                                                    <title></title>
+                                                    <g id="icomoon-ignore">
+                                                    </g>
+                                                    <path d="M480 0h32v368c0 44.183-50.145 80-112 80s-112-35.817-112-80c0-44.184 50.145-80 112-80 31.342 0 59.671 9.2 80 24.020v-184.020l-256 56.889v247.111c0 44.183-50.144 80-112 80s-112-35.817-112-80c0-44.184 50.144-80 112-80 31.342 0 59.671 9.2 80 24.020v-312.020l288-64z"></path>
+                                                </svg>
+                                                Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'mysample_update' sample.id %}">
+                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" style="fill: #898989; margin-right: 5px;">
+                                                    <title></title>
+                                                    <g id="icomoon-ignore">
+                                                    </g>
+                                                    <path d="M432 0c44.182 0 80 35.817 80 80 0 18.010-5.955 34.629-16 48l-32 32-112-112 32-32c13.371-10.045 29.989-16 48-16zM32 368l-32 144 144-32 296-296-112-112-296 296zM357.789 181.789l-224 224-27.578-27.578 224-224 27.578 27.578z"></path>
+                                                </svg>
+                                                
+                                                Update Information
+                                            </a>
+                                        </li>
+                                        {% if not sample.isPublic %}
+                                        <li>
+                                            <a class="dropdown-item text-danger" onclick="modalDefinitiveDeleteSample('{{sample.id}}')" style="cursor: pointer;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 5px;">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                </svg> 
+                                                Delete Completely
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                        </ul>
+                                    </div>
+                                    {% else %}
+                                        <a class="btn btn-primary float-end" href="{% url 'my_sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 5rem; font-size: 16px;">More</a>
+                                {% endif %} 
+                            {% elif 'mycollections' in request.path %}
+                                {% if sample.user.id == user.id %}
+                                <div class="dropdown" style="margin: 0 !important ;">
+                                    <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"  style="padding: 0.1rem; z-index:1 ; position: relative; width: 5rem; height: 35.6px; font-size: 16px;">
+                                    More
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-card" aria-labelledby="dropdownMenuButton1">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'my_collection_sample_detail' collection.id sample.id %}">
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"  style="fill: #898989; margin-right: 5px;">
+                                                <title></title>
+                                                <g id="icomoon-ignore">
+                                                </g>
+                                                <path d="M480 0h32v368c0 44.183-50.145 80-112 80s-112-35.817-112-80c0-44.184 50.145-80 112-80 31.342 0 59.671 9.2 80 24.020v-184.020l-256 56.889v247.111c0 44.183-50.144 80-112 80s-112-35.817-112-80c0-44.184 50.144-80 112-80 31.342 0 59.671 9.2 80 24.020v-312.020l288-64z"></path>
+                                            </svg>
+                                            Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'my_collection_sample_update' collection.id sample.id %}">
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" style="fill: #898989; margin-right: 5px;">
+                                                <title></title>
+                                                <g id="icomoon-ignore">
+                                                </g>
+                                                <path d="M432 0c44.182 0 80 35.817 80 80 0 18.010-5.955 34.629-16 48l-32 32-112-112 32-32c13.371-10.045 29.989-16 48-16zM32 368l-32 144 144-32 296-296-112-112-296 296zM357.789 181.789l-224 224-27.578-27.578 224-224 27.578 27.578z"></path>
+                                            </svg>
+                                            Update Information
+                                        </a>
+                                    </li>
+                                    {% if not sample.isPublic %}
+                                        <li>
+                                            <a class="dropdown-item text-danger" onclick="modalDefinitiveDeleteSample('{{sample.id}}')" style="cursor: pointer;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 5px;">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                </svg> 
+                                                Delete Completely
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    </ul>
+                                </div>
+                                {% else %}
+                                    <a class="btn btn-primary float-end" href="{% url 'my_sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 5rem; font-size: 16px;">More</a>              
+                                {% endif %}
+                            {% elif 'collections' in request.path %}
+                                <a class="btn btn-primary float-end" href="{% url 'sample_detail' sample.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 5rem; font-size: 16px;">More</a>              
+                            {% endif %}
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>

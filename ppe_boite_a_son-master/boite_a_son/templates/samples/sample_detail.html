@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block menu_sample %}active{% endblock %}
+
+{% block groupaction %}
+<div class="btn-toolbar justify-content-end" role="toolbar">
+  <div class="btn-group me-3" role="group">
+    <button class="btn btn-success" id="btnPlay" onclick="play()">
+      Play
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play" viewBox="0 0 16 16">
+        <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+      </svg>
+    </button>
+      <button class="btn btn-danger" id="btnStop" onclick="stop()">
+        Stop
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16">
+          <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>
+        </svg>
+    </button>
+  </div>
+  <div class="btn-group me-3" role="group">
+    <button class="btn btn-outline-secondary btn-outline-secondary-perso" type="button" data-bs-toggle="modal" data-bs-target="#warningModalCut">
+      -|<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-soundwave" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5zm-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zm12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z"/>
+      </svg>|-
+      Trim outside
+    </button>
+    <button type="button" class="btn btn-outline-secondary btn-outline-secondary-perso dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item text-white" data-bs-toggle="modal" data-bs-target="#warningModalSilence" style="cursor: pointer;"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-mute-fill me-1" viewBox="0 0 16 16">
+        <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zm7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"/>
+        </svg>
+        Silence
+      </a></li>
+      <li><a class="dropdown-item text-white" data-bs-toggle="modal" data-bs-target="#warningModalReverse" style="cursor: pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-symmetry-vertical me-1" viewBox="0 0 16 16">
+          <path d="M7 2.5a.5.5 0 0 0-.939-.24l-6 11A.5.5 0 0 0 .5 14h6a.5.5 0 0 0 .5-.5v-11zm2.376-.484a.5.5 0 0 1 .563.245l6 11A.5.5 0 0 1 15.5 14h-6a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .376-.484zM10 4.46V13h4.658L10 4.46z"/>
+        </svg>
+        Reverse
+      </a></li>
+      <li><a class="dropdown-item text-white" style="cursor: pointer;" id="addEnv" onclick="openEnv()">
+        <svg class="me-1" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" x="0px" y="0px" viewBox="0 0 224.008 224.008" style="enable-background:new 0 0 224.008 224.008; fill:var(--color)" xml:space="preserve">
+        <g><g>
+            <path d="M222.399,203.475l-98-195.6c-5.2-10.5-19.9-10.5-25.2,0l-97.5,195.6c-8.4,16.8,16.8,29.4,25.2,12.6l84.9-171l85.5,171
+              c6.3,13.1,26.7,8.4,26.7-6.3C223.999,207.675,223.499,205.075,222.399,203.475z"/>
+          </g></g>
+        </svg>
+        Add Envelope
+      </a></li>
+    </ul>
+  </div>
+  <div class="btn-group me-3" role="group">
+    <button id="saveMenu" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Save Menu</button>
+    <ul class="dropdown-menu" aria-labelledby="saveMenu">
+      <li><a class="dropdown-item text-white" href="#" id="saveAsNew" data-bs-toggle="modal" data-bs-target="#formModal" onclick="initCreateSampleForm()">Save as New Sample</a></li>
+      <li><a class="dropdown-item text-white" href="#" id="download_link" onclick="export_region('{{object.name}}')">Download Selection</a></li>
+    </ul>
+  </div>
+</div>
+<div class="modal fade" id="formModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="formModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+      <div class="modal-header">
+        <h5 class="modal-title" id="formModalLabel">Create New Sample</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" enctype="multipart/form-data" id="sampleForm" name="sampleForm">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+              {{form.name|as_crispy_field}}
+            </div>
+            <div class="row d-none">
+              <input type="file" name="file" class="d-none" id="id_file">
+            </div>
+            <div class="row mt-2">
+              <span class="text-muted">Note : The new Sample will be private ! Consider to publish it 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
+                  <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+                </svg>
+              </span>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="modalOff()">Cancel</button>
+          <button class="btn btn-primary" type="button" data-bs-dismiss="modal" onclick="submitCreateForm()">Add on site</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warningModalCut" tabindex="-1" aria-labelledby="warningModalCutLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: var(--primary-color); color: var(--color);">
+      <div class="modal-header">
+        <h5 class="modal-title" id="warningModalCutLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You're about to change this sample for the current edit session. This action will be <u style="color: red;">non-reversible</u> until you save your new sample. Otherwise, you only need to refresh the page but this will cancel all changes on the current sample.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="cutOutsideRegion()">OK !</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warningModalSilence" tabindex="-1" aria-labelledby="warningModalSilenceLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: var(--primary-color); color: var(--color);">
+      <div class="modal-header">
+        <h5 class="modal-title" id="warningModalSilenceLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You're about to change this sample for the current edit session. This action will be <u style="color: red;">non-reversible</u> until you save your new sample. Otherwise, you only need to refresh the page but this will cancel all changes on the current sample.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="cutInsideRegion()">OK !</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warningModalReverse" tabindex="-1" aria-labelledby="warningModalReverseLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: var(--primary-color); color: var(--color);">
+      <div class="modal-header">
+        <h5 class="modal-title" id="warningModalReverseLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You're about to change this sample for the current edit session. This action will be <u style="color: red;">non-reversible</u> until you save your new sample. Otherwise, you only need to refresh the page but this will cancel all changes on the current sample.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="reverseRegion()">OK !</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warningModalEnv" tabindex="-1" aria-labelledby="warningModalEnvLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: var(--primary-color); color: var(--color);">
+      <div class="modal-header">
+        <h5 class="modal-title" id="warningModalEnvLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You're about to change this sample for the current edit session. This action will be <u style="color: red;">non-reversible</u> until you save your new sample. Otherwise, you only need to refresh the page but this will cancel all changes on the current sample.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="applyEnv()">OK !</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<h2>Sample {{object.name}}</h2>
+<div id="waveform"> </div>
+<div id="timeline" style="padding-bottom: 20px;"></div>
+<div class="position-relative">
+  <div class="row my-2 position-absolute top-0 end-0 mx-2">
+    <div class="col-sm-1">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="16" viewBox="0 0 512 512" style="fill: var(--icon-color); width: 16px;">
+        <title></title>
+        <g id="icomoon-ignore">
+        </g>
+        <path d="M496.131 435.698l-121.276-103.147c-12.537-11.283-25.945-16.463-36.776-15.963 28.628-33.534 45.921-77.039 45.921-124.588 0-106.039-85.961-192-192-192s-192 85.961-192 192 85.961 192 192 192c47.549 0 91.054-17.293 124.588-45.922-0.5 10.831 4.68 24.239 15.963 36.776l103.147 121.276c17.661 19.623 46.511 21.277 64.11 3.678s15.946-46.449-3.677-64.11zM192 320c-70.692 0-128-57.308-128-128s57.308-128 128-128 128 57.308 128 128-57.307 128-128 128zM96 160h192v64h-192z"></path>
+        </svg>
+    </div>
+    <div class="col-sm-9 mx-1">
+      <input class="form-range" data-action="zoom" type="range" min="20" max="5000" value="0" style="width: 100%">
+    </div>
+    <div class="col-sm-1">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="16" viewBox="0 0 512 512" style="fill: var(--icon-color); width: 16px;">
+        <title></title>
+        <g id="icomoon-ignore">
+        </g>
+        <path d="M496.131 435.698l-121.276-103.147c-12.537-11.283-25.945-16.463-36.776-15.963 28.628-33.534 45.921-77.039 45.921-124.588 0-106.039-85.961-192-192-192s-192 85.961-192 192 85.961 192 192 192c47.549 0 91.054-17.293 124.588-45.922-0.5 10.831 4.68 24.239 15.963 36.776l103.147 121.276c17.661 19.623 46.511 21.277 64.11 3.678s15.946-46.449-3.677-64.11zM192 320c-70.692 0-128-57.308-128-128s57.308-128 128-128 128 57.308 128 128-57.307 128-128 128zM224 96h-64v64h-64v64h64v64h64v-64h64v-64h-64z"></path>
+        </svg>
+    </div>
+  </div>
+</div>
+
+<h3>Informations</h3>
+<ul>
+  <li>Sample created by {{object.user}} ({{object.created_date}}).</li>
+  <li>Sampling rate : <span id='sampleRate'>Not loaded</span></li>
+  <li>Bit depth : <span id='bitdepth'>{{object.get_bits_per_sample}} bits</span></li>
+  <li>Number of Channels : <span id='numberOfChannels'>Not loaded</span></li>
+  <li>Duration : <span id='duration'>Not loaded</span></li>
+</ul>
+
+<div class="d-none" id="envelope" style="display: flex; align-items: center; flex-direction: column; position: absolute; left: 55%; top: 390px; width: 600px; border:5px solid var(--border-color); border-radius: 5px; padding: 1rem 2rem 1rem 4rem;">
+  <button type="button" class="btn btn-transparent shadow-none" style="position: absolute; right: 0; top: 0;" onclick="cancelEnv()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#898989" class="bi bi-x-lg" viewBox="0 0 16 16">
+      <path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
+    </svg>
+  </button>
+  <h3>Envelope</h3>
+  <p id="envExplain" class="fst-italic mt-2">Envelope modulates the sample volume through time.</p>
+  <div class="form-check form-switch" style="display: flex; align-items: center;">
+    <input class="form-check-input" type="checkbox" id="flexSwitchCheckMode"  value="false" onclick="changeEnvMode()">
+    <label class="form-check-label ms-2" for="flexSwitchCheckMode">Apply on region</label>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#warningModalEnv" style="margin-left: 5rem;">Apply Envelope</button>
+  </div>
+  <div>
+    <div style="display: flex; margin-left: -22px;">
+      <div style="display: grid; grid-template-columns: auto auto; align-items: start; justify-items: end;">
+        <p>100%</p><p>-</p>
+        <p>75%</p><p>-</p>
+        <p>50%</p><p>-</p>
+        <p>25%</p><p>-</p>
+        <p>0%</p><p>-</p>
+      </div>
+      <div style="margin: 9px 0 52px 0 ;background-color:#69696979; height: 300px; width: 500px; position: relative; border-left: 2px solid var(--color); border-bottom: 2px solid var(--color);">
+        <div id="startPoint" style="border: 2px solid red; width: 10px; height: 10px; background-color: red; position: absolute; bottom: 0; left: 0;"></div>
+        <div id="draggable" style="border: 2px solid red; border-radius: 5px; width: 10px; height: 10px; background-color: red; position: absolute; top: 0; left: 0;"></div>
+        <div id="endPoint" style="border: 2px solid red; width: 10px; height: 10px; background-color: red; position: absolute; top: 0; right: 0;"></div>
+      </div>
+    </div>
+    <div style="display: grid; width: 100%; grid-template-columns: repeat(9, 61px); grid-template-rows: 20px 24px; align-items: start; justify-items: center; margin-top: -58px;">
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>|</p>
+      <p>0s</p>
+      <p id="1"></p>
+      <p id="2"></p>
+      <p id="3"></p>
+      <p id="4"></p>
+      <p id="5"></p>
+      <p id="6"></p>
+      <p id="7"></p>
+      <p id="8"></p>
+    </div>
+  </div>
+</div>
+    
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+var RegionsPlugin = window.WaveSurfer.regions;
+var info;
+var TimelinePlugin = window.WaveSurfer.timeline;
+
+/**
+ * Use formatTimeCallback to style the notch labels as you wish, such
+ * as with more detail as the number of pixels per second increases.
+ *
+ * Here we format as M:SS.frac, with M suppressed for times < 1 minute,
+ * and frac having 0, 1, or 2 digits as the zoom increases.
+ *
+ * Note that if you override the default function, you'll almost
+ * certainly want to override timeInterval, primaryLabelInterval and/or
+ * secondaryLabelInterval so they all work together.
+ *
+ * @param: seconds
+ * @param: pxPerSec
+ */
+ function formatTimeCallback(seconds, pxPerSec) {
+    seconds = Number(seconds);
+    var minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+
+    // fill up seconds with zeroes
+    var secondsStr = Math.round(seconds).toString();
+    if (pxPerSec >= 25 * 10) {
+        secondsStr = seconds.toFixed(2);
+    } else if (pxPerSec >= 25 * 1) {
+        secondsStr = seconds.toFixed(1);
+    }
+
+    if (minutes > 0) {
+        if (seconds < 10) {
+            secondsStr = '0' + secondsStr;
+        }
+        return `${minutes}:${secondsStr}`;
+    }
+    return secondsStr;
+}
+
+/**
+ * Use timeInterval to set the period between notches, in seconds,
+ * adding notches as the number of pixels per second increases.
+ *
+ * Note that if you override the default function, you'll almost
+ * certainly want to override formatTimeCallback, primaryLabelInterval
+ * and/or secondaryLabelInterval so they all work together.
+ *
+ * @param: pxPerSec
+ */
+function timeInterval(pxPerSec) {
+    var retval = 1;
+    if (pxPerSec >= 25 * 100) {
+        retval = 0.01;
+    } else if (pxPerSec >= 25 * 40) {
+        retval = 0.025;
+    } else if (pxPerSec >= 25 * 10) {
+        retval = 0.1;
+    } else if (pxPerSec >= 25 * 4) {
+        retval = 0.25;
+    } else if (pxPerSec >= 25) {
+        retval = 1;
+    } else if (pxPerSec * 5 >= 25) {
+        retval = 5;
+    } else if (pxPerSec * 15 >= 25) {
+        retval = 15;
+    } else {
+        retval = Math.ceil(0.5 / pxPerSec) * 60;
+    }
+    return retval;
+}
+
+/**
+ * Return the cadence of notches that get labels in the primary color.
+ * EG, return 2 if every 2nd notch should be labeled,
+ * return 10 if every 10th notch should be labeled, etc.
+ *
+ * Note that if you override the default function, you'll almost
+ * certainly want to override formatTimeCallback, primaryLabelInterval
+ * and/or secondaryLabelInterval so they all work together.
+ *
+ * @param pxPerSec
+ */
+function primaryLabelInterval(pxPerSec) {
+    var retval = 1;
+    if (pxPerSec >= 25 * 100) {
+        retval = 10;
+    } else if (pxPerSec >= 25 * 40) {
+        retval = 4;
+    } else if (pxPerSec >= 25 * 10) {
+        retval = 10;
+    } else if (pxPerSec >= 25 * 4) {
+        retval = 4;
+    } else if (pxPerSec >= 25) {
+        retval = 1;
+    } else if (pxPerSec * 5 >= 25) {
+        retval = 5;
+    } else if (pxPerSec * 15 >= 25) {
+        retval = 15;
+    } else {
+        retval = Math.ceil(0.5 / pxPerSec) * 60;
+    }
+    return retval;
+}
+
+/**
+ * Return the cadence of notches to get labels in the secondary color.
+ * EG, return 2 if every 2nd notch should be labeled,
+ * return 10 if every 10th notch should be labeled, etc.
+ *
+ * Secondary labels are drawn after primary labels, so if
+ * you want to have labels every 10 seconds and another color labels
+ * every 60 seconds, the 60 second labels should be the secondaries.
+ *
+ * Note that if you override the default function, you'll almost
+ * certainly want to override formatTimeCallback, primaryLabelInterval
+ * and/or secondaryLabelInterval so they all work together.
+ *
+ * @param pxPerSec
+ */
+function secondaryLabelInterval(pxPerSec) {
+    // draw one every 10s as an example
+    return Math.floor(10 / timeInterval(pxPerSec));
+}
+
+var wavesurfer = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: 'gray',
+    progressColor: 'red',
+    plugins: [
+        RegionsPlugin.create({}),
+        TimelinePlugin.create({
+          container: '#timeline',
+          formatTimeCallback: formatTimeCallback,
+          timeInterval: timeInterval,
+          primaryLabelInterval: primaryLabelInterval,
+          secondaryLabelInterval: secondaryLabelInterval,
+          primaryFontColor: 'red',
+          primaryColor: 'red',
+          secondaryColor: 'red',
+          secondaryFontColor: 'red',
+        }),
+    ],
+    cursorColor:'red',
+    hideScrollbar:false,
+});
+
+window.onload=initWaveform;
+async function initWaveform() {
+  var blob = await fetchFile('{{object.file.url}}');
+  wavesurfer.loadBlob(blob);
+}
+
+function fetchFile(url){
+  return new Promise((resolve, reject) => {
+    fetch(url).then((response) => {
+      if (response.ok) {
+        resolve(response.blob());
+      }
+      reject(new Error('Network response was not ok.'));
+    });
+  }
+)}
+
+function play(){
+  if (envOn) {
+    gain.gain.setValueAtTime(envCoords.startRatio, wavesurfer.backend.ac.currentTime);
+    gain.gain.linearRampToValueAtTime(envCoords.atk.ratio, wavesurfer.backend.ac.currentTime+envCoords.atk.time);
+    gain.gain.linearRampToValueAtTime(envCoords.endRatio, wavesurfer.backend.ac.currentTime+wavesurfer.getDuration());
+  }
+  wavesurfer.regions.list["clip"].play();
+};
+
+function stop(){
+  wavesurfer.stop();
+};
+
+// Zoom slider
+let slider = document.querySelector('[data-action="zoom"]');
+
+slider.value = wavesurfer.params.minPxPerSec;
+slider.min = wavesurfer.params.minPxPerSec;
+
+slider.addEventListener('input', function() {
+    wavesurfer.zoom(Number(this.value));
+});
+
+// event = keyup or keydown
+var sampleReadStatus = false;
+var modalOn = false;
+document.addEventListener('keydown', event => {
+  if (!modalOn) {
+    if (event.code === 'Space') {
+      if(sampleReadStatus){
+        stop();
+        sampleReadStatus=false;
+      }
+      else{
+        play();
+        sampleReadStatus=true;
+      }
+    }
+  }
+});
+var count=0;
+
+wavesurfer.on('ready',(e)=>{
+  wavesurfer.enableDragSelection({
+    id:"clip",
+    color: "rgba(0, 0, 100, 0.2)",
+    loop:true,
+  });
+  var duration = wavesurfer.getDuration();
+  wavesurfer.addRegion({
+    id: "clip",   
+    start: 0, // time in seconds
+    end: duration, // time in seconds
+    color: 'rgba(0, 0, 100, 0.2)'
+  });
+  count++;
+  //extract info 
+  var originalBuffer = wavesurfer.backend.buffer;
+  document.getElementById("duration").innerHTML = originalBuffer.duration.toFixed(2)+ " s";
+  document.getElementById("numberOfChannels").innerHTML = originalBuffer.numberOfChannels;
+  document.getElementById("sampleRate").innerHTML = originalBuffer.sampleRate+ " Hz";
+})
+
+wavesurfer.on('finish', stop);
+
+wavesurfer.on('region-dblclick',deleteRegions);
+
+function deleteRegions(){
+  wavesurfer.clearRegions();
+}
+
+wavesurfer.on('region-created', clearOthers);
+function clearOthers(region){
+  count++;
+  if (count>1){
+    wavesurfer.clearRegions();
+  }
+}
+
+function getOriginalSample() {
+  var originalBuffer = wavesurfer.backend.buffer;
+  var sampleRate = originalBuffer.sampleRate;
+  var offset = parseInt((wavesurfer.regions.list["clip"].start)*sampleRate);
+  var end = parseInt((wavesurfer.regions.list["clip"].end)*sampleRate);
+  var originalBufferChannels = [originalBuffer.getChannelData(0), originalBuffer.getChannelData(1)];
+  return {buffer:originalBuffer, sampleRate:sampleRate, offset:offset, end:end, channels:originalBufferChannels};
+}
+
+function cutOutsideRegion(){
+  var originalSample = getOriginalSample();
+  var maskArray = new Float32Array(originalSample.buffer.length);
+  for (let i = originalSample.offset; i < originalSample.end; i++) {
+    maskArray[i] = 1;
+  }
+  applyChanges(maskArray);
+}
+
+function cutInsideRegion() {
+  var originalSample = getOriginalSample();
+  var maskArray = new Float32Array(originalSample.buffer.length);
+  for (let i = 0; i < maskArray.length; i++) {
+    if (i<originalSample.offset||i>=originalSample.end) {
+      maskArray[i]=1;
+    }
+  }
+  applyChanges(maskArray);
+}
+
+async function reverseRegion() {
+  var originalSample = getOriginalSample();
+  var tmpArray = [];
+  for (let i = 0; i < originalSample.channels.length; i++) {
+    const channel = originalSample.channels[i];
+    tmpArray[i]=channel.slice(originalSample.offset, originalSample.end);
+    tmpArray[i].reverse();
+    
+    for (let j = originalSample.offset; j < originalSample.end; j++) {
+      channel[j]=tmpArray[i][j-originalSample.offset];
+    }
+  }
+  var audioBuffer = new AudioBuffer({length:originalSample.buffer.length, numberOfChannels:originalSample.buffer.numberOfChannels, sampleRate:originalSample.sampleRate});
+  for (let i = 0; i < originalSample.channels.length; i++) {
+    const channel = originalSample.channels[i];
+    audioBuffer.copyToChannel(channel, i);
+  }
+  var url = bufferToWave(audioBuffer, 0, audioBuffer.length, {{object.get_bits_per_sample}})
+  var blob = await fetchFile(url);
+  wavesurfer.loadBlob(blob);
+}
+
+window.onbeforeunload = function (e) {
+  var e = e || window.event;
+
+  // For IE and Firefox
+  if (e) {
+    e.returnValue = "You're about to leave this page without saving. Consider create a new sample to save your changes !";
+  }
+  return "You're about to leave this page without saving. Consider create a new sample to save your changes !";
+}
+
+async function applyChanges(maskArray) {
+  var originalSample = getOriginalSample();
+  originalSample.channels.forEach(channel => {
+    for (let j = 0; j < maskArray.length; j++) {
+      const ratio = maskArray[j];
+      const sample = channel[j];
+      channel[j] = sample*ratio;
+    }
+  });
+  var audioBuffer = new AudioBuffer({length:originalSample.buffer.length, numberOfChannels:originalSample.buffer.numberOfChannels, sampleRate:originalSample.sampleRate});
+  for (let i = 0; i < originalSample.channels.length; i++) {
+    const channel = originalSample.channels[i];
+    audioBuffer.copyToChannel(channel, i);
+  }
+  var url = bufferToWave(audioBuffer, 0, audioBuffer.length, {{object.get_bits_per_sample}})
+  var blob = await fetchFile(url);
+  wavesurfer.loadBlob(blob);
+}
+
+
+
+function createBlobUrlFromRegion(){
+  var originalBuffer = wavesurfer.backend.buffer;
+  var sampleRate = originalBuffer.sampleRate;
+  var offset = parseInt((wavesurfer.regions.list["clip"].start)*sampleRate);
+  var end = parseInt((wavesurfer.regions.list["clip"].end)*sampleRate);
+  var blobUrl = bufferToWave(originalBuffer, offset, end-offset, {{object.get_bits_per_sample}});
+  return blobUrl;
+}
+
+function export_region(sampleName)
+{  
+  var blobUrl = createBlobUrlFromRegion();
+  var target = document.getElementById("download_link");
+  target.href = blobUrl;
+  target.download = sampleName + ".wav";
+  target.classList.remove('d-none');
+  var downloadOnSite = document.getElementById('saveAsNew');
+  downloadOnSite.classList.remove('d-none');
+}
+
+var newFile = null;
+async function initCreateSampleForm()
+{
+  modalOn = true;
+  var blobUrl = createBlobUrlFromRegion();
+  newfile = await fetch(blobUrl).then(r => r.blob()).then(blobFile => new File([blobFile], "tmp.wav", { type: "audio/wav" })).then(file => setNewFile(file));
+}
+
+function setNewFile(file) {
+  newFile = file;
+}
+
+function submitCreateForm() {
+  var body = document.querySelector('body')
+  var newDiv = document.createElement("DIV");
+  newDiv.style.cursor = "wait";
+  newDiv.style.position  ="absolute";
+  newDiv.style.top = "0";
+  newDiv.style.left = "0";
+  newDiv.style.zIndex = "1050";
+  newDiv.style.height = "100vh";
+  newDiv.style.width = "100%";
+  newDiv.setAttribute("id", "temporaryDiv");
+  body.appendChild(newDiv);
+  var form = document.getElementById('sampleForm');
+  var newSampleName = document.getElementById('id_name').value;
+  var formData = new FormData(form);
+  formData.set('file',newFile,(newSampleName+".wav"));
+  var path = '{{request.path}}';
+  modalOff(); 
+  //change url for http://127.0.0.1:8000 when dev (https://banana-cobbler-95780.herokuapp.com sinon)
+  fetch('https://banana-cobbler-95780.herokuapp.com'+path,{
+    method:'POST',
+    body:formData,
+  }).then(response => {
+    if (response.redirected) {
+      setTimeout(()=>{document.getElementById("temporaryDiv").remove()}, 2000);
+      window.location.href = response.url;
+    }
+  })
+}
+
+function modalOff(){
+  modalOn = false;
+}
+
+function openEnv() {
+  if (!envOn) {
+    document.getElementById('envelope').classList.remove('d-none');
+    initEnv(wavesurfer.getDuration());
+    initEnvGraph(wavesurfer.getDuration());
+  }
+}
+
+function changeEnvMode() {
+  var switchBtn = document.getElementById("flexSwitchCheckMode");
+  if (switchBtn.value=='true') {
+    switchBtn.setAttribute('value', false);
+    regionMode =  false;
+    setEnvAbsciss(wavesurfer.getDuration());
+  } else {
+    switchBtn.setAttribute('value', true);
+    regionMode=true;
+    var duration = wavesurfer.regions.list["clip"].end-wavesurfer.regions.list["clip"].start;
+    setEnvAbsciss(duration);
+  }
+}
+
+var envCoords = {startRatio:0, atk:{time:0, ratio:1}, endRatio:1};
+var envOn = false;
+var envObjects = {atkDraggable:null, startDraggable:null, endDraggable:null, atkLine:null, releaseLine:null};
+var regionMode = false;
+
+function initEnvGraph(duration){
+  envOn = true;
+  var atkPoint = document.getElementById('draggable'),
+  startPoint = document.getElementById('startPoint'),
+  endPoint = document.getElementById('endPoint'),
+  atkLine, releaseLine;
+
+  var atkDraggable = new PlainDraggable(atkPoint, {
+    onMove: function(e) {
+        atkLine.position();
+        releaseLine.position();
+        //console.log(e);
+        if (regionMode) {
+          duration =wavesurfer.regions.list["clip"].end-wavesurfer.regions.list["clip"].start;
+        }
+        envCoords.atk.time = ((e.left-1113.515625)/488)*duration;
+        envCoords.atk.ratio = (837-e.top)/288;
+        //console.log(envCoords);
+        
+      },
+    onMoveStart: function() { atkLine.dash = {animation: true}; releaseLine.dash = {animation: true}; },
+    onDragEnd: function() { atkLine.dash = false; releaseLine.dash = false; }
+  });
+  envObjects.atkDraggable=atkDraggable;
+
+  var startAttach = LeaderLine.pointAnchor({element:startPoint,x:5, y:5}),
+  endAttach = LeaderLine.pointAnchor({element:endPoint,x:5, y:5});
+
+  var startDraggable = new PlainDraggable(startPoint, {
+    onMove: function(e) {
+        atkLine.position();
+        releaseLine.position();
+        envCoords.startRatio = (837-e.top)/288;
+      },
+    onMoveStart: function() { atkLine.dash = {animation: true}; releaseLine.dash = {animation: true}; },
+    onDragEnd: function() { atkLine.dash = false; releaseLine.dash = false; }
+  });
+
+  envObjects.startDraggable=startDraggable;
+
+  var endDraggable = new PlainDraggable(endPoint, {
+    onMove: function(e) {
+        atkLine.position();
+        releaseLine.position();
+        envCoords.endRatio = (837-e.top)/288;
+      },
+    onMoveStart: function() { atkLine.dash = {animation: true}; releaseLine.dash = {animation: true}; },
+    onDragEnd: function() { atkLine.dash = false; releaseLine.dash = false; }
+  });
+
+  envObjects.endDraggable=endDraggable
+
+  startDraggable.containment = {left:1113.515625, top:479, width:10, height:298};
+  endDraggable.containment = {left:1601.515625, top:479, width:10, height:298};
+
+  atkLine = new LeaderLine(startAttach, atkPoint,
+    {startPlug: 'square', endPlug:'disc', path:'straight', color:'red'});
+
+  envObjects.atkLine = atkLine;
+
+  releaseLine = new LeaderLine(atkPoint, endAttach,
+    {startPlug: 'disc', endPlug:'square', path:'straight', color:'red'});
+
+  envObjects.releaseLine=releaseLine;
+
+  atkLine.end = releaseLine.start = LeaderLine.pointAnchor(atkPoint);
+
+  setEnvAbsciss(duration);
+}
+
+function setEnvAbsciss(duration) {
+  for (let i = 1; i < 9; i++) {
+    var label = document.getElementById(i.toString());
+    var value = i*duration/8;
+    label.innerHTML = value.toFixed(2)+'s';
+  }
+}
+
+wavesurfer.on('region-update-end', function (region) {
+  if (regionMode) {
+    var duration = region.end-region.start;
+    setEnvAbsciss(duration);
+  }
+})
+
+var gain;
+
+function initEnv(duration) {
+  gain = wavesurfer.backend.ac.createGain();
+  wavesurfer.backend.setFilter(gain);
+}
+
+function applyEnv() {
+  var originalSample = getOriginalSample();
+  var maskArray = new Float32Array(originalSample.buffer.length);
+  if (regionMode) {
+    var regionLength = originalSample.end-originalSample.offset;
+    var regionDuration = regionLength/originalSample.sampleRate;
+    var x0 = envCoords.atk.time*regionLength/regionDuration;
+    var a = (envCoords.atk.ratio-envCoords.startRatio)/(x0);
+    var b = (envCoords.endRatio-envCoords.atk.ratio)/(regionLength-x0);
+    for (let x = 0; x < maskArray.length; x++) {
+      if (x<x0 && x>=originalSample.offset) {
+        maskArray[x] = a*x+envCoords.startRatio;
+      }
+      else if (x>=x0 && x<originalSample.end) {
+        maskArray[x] = b*(x-x0)+envCoords.atk.ratio;
+      }
+      else {
+        maskArray[x]=1;
+      }
+    }
+    console.log(regionLength, regionDuration, x0,envCoords.atk.time , a, b);
+  } else {
+    var duration = wavesurfer.getDuration();
+    var x0 = envCoords.atk.time*maskArray.length/duration;
+    var a = (envCoords.atk.ratio-envCoords.startRatio)/(x0);
+    var b = (envCoords.endRatio-envCoords.atk.ratio)/(maskArray.length-x0);
+    for (let x = 0; x < maskArray.length; x++) {
+      if (x<x0) {
+        maskArray[x] = a*x+envCoords.startRatio;
+      }
+      else {
+        maskArray[x] = b*(x-x0)+envCoords.atk.ratio;
+      }
+    }
+  }
+  applyChanges(maskArray);
+}
+
+function cancelEnv() {
+  document.getElementById('envelope').classList.add('d-none');
+  envObjects.atkDraggable.remove();
+  envObjects.startDraggable.remove();
+  envObjects.atkLine.remove();
+  envObjects.endDraggable.remove();
+  envObjects.releaseLine.remove();
+  envOn = false;
+}
+
+window.addEventListener('keydown',function(e){
+  if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){
+    if(e.target.nodeName=='INPUT'&&e.target.type=='text'){
+      e.preventDefault();return false;
+    }
+  }
+},true);
+
+
+</script>
+{% endblock %}

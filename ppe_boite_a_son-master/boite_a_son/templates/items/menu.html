@@ -1,0 +1,395 @@
+{% load static %}
+{% csrf_token %}
+{% load thumbnail %}
+
+
+<div class="float-start d-none d-lg-block position-fixed" id="myMenu" style="background-color: var(--menu-bg-color); min-width: {{request.session.menuSize}}; width: {{request.session.menuSize}}; min-height: 100vh; top: 65px;">
+    <div style="margin-top: 20px" class="menu">
+        <div>
+            {% url 'home' as the_url %}
+            {% if request.get_full_path == the_url %}
+            <a class="element-actif" href="{% url 'home' %}" style="border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; height: 30px;">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                        <title>Home</title>
+                        <g id="icomoon-ignore"></g>
+                        <path d="M512 295.222l-256-198.713-256 198.714v-81.019l256-198.713 256 198.714zM448 288v192h-128v-128h-128v128h-128v-192l192-144z"></path>
+                    </svg>
+                    {% if "small" in request.session.menu %}
+                    <p id="menuText"></p>
+                    {% else %}
+                    <p id="menuText">Home</p>
+                    {% endif %}
+                </div>
+            </a>
+            {% else %}
+            <a class="element-no-actif" href="{% url 'home' %}" style="border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; height: 30px;">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                        <title>Home</title>
+                        <g id="icomoon-ignore"></g>
+                        <path d="M512 295.222l-256-198.713-256 198.714v-81.019l256-198.713 256 198.714zM448 288v192h-128v-128h-128v128h-128v-192l192-144z"></path>
+                    </svg>
+                    {% if "small" in request.session.menu %}
+                    <p id="menuText"></p>
+                    {% else %}
+                    <p id="menuText">Home</p>
+                    {% endif %}
+                </div>
+            </a>
+            {% endif %}
+            <div class="accordion accordion-flush user-select-none" id="accordionSamplethèque" style="border-bottom: 1px solid var(--border-color);">
+                <div class="accordion-item" style="background-color: transparent !important;">
+                    <h2 class="accordion-header" id="samplethèque">
+                        <a class="accordion-button element-no-actif shadow-none" id="samplethèqueBtn" data-bs-toggle="collapse" data-bs-target="#samplethèqueSubMenu" aria-expanded="true" aria-controls="samplethèqueSubMenu" style="background-color: transparent; color: var(--color); cursor: pointer;" onclick="switchArrow(this)">
+                            <div style="display: flex; align-items: center; height: 30px;">
+                                <svg height="30" viewBox="0 0 512 512" width="30" xmlns="http://www.w3.org/2000/svg" style="fill: #898989;">
+                                    <path d="m339.320312 303.519531-135-90c-4.601562-3.070312-10.519531-3.355469-15.398437-.746093-4.875 2.613281-7.921875 7.695312-7.921875 13.226562v180c0 5.53125 3.046875 10.613281 7.921875 13.226562 4.878906 2.609376 10.796875 2.324219 15.398437-.746093l135-90c4.171876-2.78125 6.679688-7.464844 6.679688-12.480469s-2.507812-9.699219-6.679688-12.480469zm-128.320312 74.453125v-123.945312l92.957031 61.972656zm0 0"/>
+                                    <path d="m497 121h-15v-45c0-8.285156-6.714844-15-15-15h-15v-46c0-8.285156-6.714844-15-15-15h-362c-8.285156 0-15 6.714844-15 15v46h-15c-8.285156 0-15 6.714844-15 15v45h-15c-8.285156 0-15 6.714844-15 15v361c0 8.285156 6.714844 15 15 15h482c8.285156 0 15-6.714844 15-15v-361c0-8.285156-6.714844-15-15-15zm-407-91h332v31h-332zm-30 61h392v30h-392zm422 391h-452v-331h452zm0 0"/>
+                                </svg>
+                                {% if "small" in request.session.menu %}
+                                <p id="menuText"></p>
+                                {% else %}
+                                <p id="menuText">Samplethèque</p>
+                                {% endif %} 
+                                <svg xmlns="http://www.w3.org/2000/svg" id="arrowSamplethèque" width="30" height="30" fill="#898989" class="bi bi-chevron-up" viewBox="0 0 16 16" style="margin-left: auto; margin-right: 5px;">
+                                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                                </svg>
+                            </div>
+                        </a>
+                    </h2>
+                    <div id="samplethèqueSubMenu" class="accordion-collapse collapse {{request.session.submenu1_state}}" aria-labelledby="samplethèque">
+                        <div class="accordion-body" style="background-color: var(--submenu-bg-color);">
+                            {% url 'sample_list' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'sample_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>Sample</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M458.903 114.538c-11.105-15.146-26.587-32.85-43.589-49.852s-34.706-32.482-49.852-43.589c-25.787-18.91-38.296-21.097-45.462-21.097h-248c-22.056 0-40 17.944-40 40v432c0 22.056 17.943 40 40 40h368c22.056 0 40-17.944 40-40v-312c0-7.166-2.186-19.675-21.097-45.462v0zM392.687 87.313c15.35 15.35 27.4 29.199 36.29 40.687h-76.977v-76.973c11.491 8.89 25.339 20.939 40.687 36.286v0zM448 472c0 4.336-3.664 8-8 8h-368c-4.336 0-8-3.664-8-8v-432c0-4.336 3.664-8 8-8 0 0 247.978-0.001 248 0v112c0 8.836 7.162 16 16 16h112v312z"></path>
+                                        <path d="M378.144 195.626c-3.707-3.040-8.582-4.257-13.281-3.316l-160 32c-7.479 1.497-12.863 8.063-12.863 15.69v118.438c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-114.883l128-25.601v66.921c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-159.999c0-4.793-2.149-9.334-5.856-12.374z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Samples</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'sample_list' %}">
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>Sample</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M458.903 114.538c-11.105-15.146-26.587-32.85-43.589-49.852s-34.706-32.482-49.852-43.589c-25.787-18.91-38.296-21.097-45.462-21.097h-248c-22.056 0-40 17.944-40 40v432c0 22.056 17.943 40 40 40h368c22.056 0 40-17.944 40-40v-312c0-7.166-2.186-19.675-21.097-45.462v0zM392.687 87.313c15.35 15.35 27.4 29.199 36.29 40.687h-76.977v-76.973c11.491 8.89 25.339 20.939 40.687 36.286v0zM448 472c0 4.336-3.664 8-8 8h-368c-4.336 0-8-3.664-8-8v-432c0-4.336 3.664-8 8-8 0 0 247.978-0.001 248 0v112c0 8.836 7.162 16 16 16h112v312z"></path>
+                                        <path d="M378.144 195.626c-3.707-3.040-8.582-4.257-13.281-3.316l-160 32c-7.479 1.497-12.863 8.063-12.863 15.69v118.438c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-114.883l128-25.601v66.921c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-159.999c0-4.793-2.149-9.334-5.856-12.374z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Samples</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                            {% url 'collection_list' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'collection_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>Collection</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Collections</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'collection_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>Collection</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Collections</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                            {% url 'recents' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'recents' %}">
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>Recent</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M329.372 374.628l-105.372-105.373v-141.255h64v114.745l86.628 86.627zM256 0c-141.385 0-256 114.615-256 256s114.615 256 256 256 256-114.615 256-256-114.615-256-256-256zM256 448c-106.039 0-192-85.961-192-192s85.961-192 192-192c106.039 0 192 85.961 192 192s-85.961 192-192 192z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Recents</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'recents' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>Recent</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M329.372 374.628l-105.372-105.373v-141.255h64v114.745l86.628 86.627zM256 0c-141.385 0-256 114.615-256 256s114.615 256 256 256 256-114.615 256-256-114.615-256-256-256zM256 448c-106.039 0-192-85.961-192-192s85.961-192 192-192c106.039 0 192 85.961 192 192s-85.961 192-192 192z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">Recents</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion accordion-flush user-select-none" id="accordionStudio" style="border-bottom: 1px solid var(--border-color);">
+                <div class="accordion-item" style="background-color: transparent !important;">
+                    <h2 class="accordion-header" id="studio">
+                        <a class="accordion-button element-no-actif shadow-none" id="studioBtn" data-bs-toggle="collapse" data-bs-target="#studioSubMenu" aria-expanded="true" aria-controls="samplethèqueSubMenu" style="background-color: transparent; color: var(--color); cursor: pointer;" onclick="switchArrow(this)">
+                            <div style="display: flex; align-items: center; height: 30px;">
+                                <svg id="Capa_1" enable-background="new 0 0 512 512" height="30" viewBox="0 0 512 512" width="30" xmlns="http://www.w3.org/2000/svg" style="fill: #898989;">
+                                    <g>
+                                    <path d="m181 240v124.58c-4.695-1.665-9.741-2.58-15-2.58-24.813 0-45 20.187-45 45s20.187 45 45 45 45-20.187 45-45v-94.703l120-24v46.283c-4.695-1.665-9.741-2.58-15-2.58-24.813 
+                                    0-45 20.187-45 45s20.187 45 45 45 45-20.187 45-45c0-9.729 0-157.282 0-167 0-4.494-2.015-8.751-5.49-11.6-3.476-2.849-8.046-3.989-12.451-3.109l-150 30c-7.012 1.403-12.059 
+                                    7.559-12.059 14.709zm-15 182c-8.271 0-15-6.729-15-15s6.729-15 15-15 15 6.729 15 15-6.729 15-15 15zm150-30c-8.271 0-15-6.729-15-15s6.729-15 15-15 15 6.729 15 15-6.729 15-15 
+                                    15zm15-163.703v29.406l-120 24v-29.406z"/>
+                                    <path d="m7.716 248.862c4.766 2.646 10.587 2.5 15.21-.378l7.074-4.402v252.918c0 8.284 6.716 15 15 15h422c8.284 0 15-6.716 
+                                    15-15v-252.918l7.074 4.403c4.572 2.846 10.394 3.053 15.21.378 4.762-2.645 7.716-7.665 7.716-13.113v-70.75c0-5.182-2.675-9.997-7.074-12.735l-241-150c-4.852-3.02-11-3.02-15.852 
+                                    0l-241 150c-4.399 2.738-7.074 7.553-7.074 12.735v70.75c0 5.447 2.954 10.467 7.716 13.112zm444.284 233.138h-392v-256.59l196-121.99 196 121.99zm-422-308.668 226-140.664 226 
+                                    140.664v35.414c-22.892-14.248-203.783-126.834-218.074-135.729-2.426-1.51-5.176-2.265-7.926-2.265s-5.5.755-7.926 2.265c-20.69 12.87-197.453 122.894-218.074 135.729z"/>
+                                    </g>
+                                </svg>  
+                                {% if "small" in request.session.menu %}
+                                <p id="menuText"></p>
+                                {% else %}
+                                <p id="menuText">Studio</p>
+                                {% endif %}
+                                <svg xmlns="http://www.w3.org/2000/svg" id="arrowStudio" width="30" height="30" fill="#898989" class="bi bi-chevron-up" viewBox="0 0 16 16" style="margin-left: auto; margin-right: 5px;">
+                                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                                </svg>
+                            </div>
+                        </a>
+                    </h2>
+                    <div id="studioSubMenu" class="accordion-collapse collapse {{request.session.submenu2_state}}" aria-labelledby="studio">
+                        <div class="accordion-body" style="background-color:var(--submenu-bg-color);">
+                            {% url 'my_sample_list' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'my_sample_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>Sample</title>
+                                        <g id="icomoon-ignore"></g>
+                                        <path d="M458.903 114.538c-11.105-15.146-26.587-32.85-43.589-49.852s-34.706-32.482-49.852-43.589c-25.787-18.91-38.296-21.097-45.462-21.097h-248c-22.056 0-40 17.944-40 40v432c0 22.056 17.943 40 40 40h368c22.056 0 40-17.944 40-40v-312c0-7.166-2.186-19.675-21.097-45.462v0zM392.687 87.313c15.35 15.35 27.4 29.199 36.29 40.687h-76.977v-76.973c11.491 8.89 25.339 20.939 40.687 36.286v0zM448 472c0 4.336-3.664 8-8 8h-368c-4.336 0-8-3.664-8-8v-432c0-4.336 3.664-8 8-8 0 0 247.978-0.001 248 0v112c0 8.836 7.162 16 16 16h112v312z"></path>
+                                        <path d="M378.144 195.626c-3.707-3.040-8.582-4.257-13.281-3.316l-160 32c-7.479 1.497-12.863 8.063-12.863 15.69v118.438c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-114.883l128-25.601v66.921c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-159.999c0-4.793-2.149-9.334-5.856-12.374z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Samples</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'my_sample_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>Sample</title>
+                                        <g id="icomoon-ignore">
+                                        </g>
+                                        <path d="M458.903 114.538c-11.105-15.146-26.587-32.85-43.589-49.852s-34.706-32.482-49.852-43.589c-25.787-18.91-38.296-21.097-45.462-21.097h-248c-22.056 0-40 17.944-40 40v432c0 22.056 17.943 40 40 40h368c22.056 0 40-17.944 40-40v-312c0-7.166-2.186-19.675-21.097-45.462v0zM392.687 87.313c15.35 15.35 27.4 29.199 36.29 40.687h-76.977v-76.973c11.491 8.89 25.339 20.939 40.687 36.286v0zM448 472c0 4.336-3.664 8-8 8h-368c-4.336 0-8-3.664-8-8v-432c0-4.336 3.664-8 8-8 0 0 247.978-0.001 248 0v112c0 8.836 7.162 16 16 16h112v312z"></path>
+                                        <path d="M378.144 195.626c-3.707-3.040-8.582-4.257-13.281-3.316l-160 32c-7.479 1.497-12.863 8.063-12.863 15.69v118.438c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-114.883l128-25.601v66.921c-9.416-4.087-20.339-6.438-32-6.438-35.346 0-64 21.49-64 48s28.654 48 64 48 64-21.49 64-48v-159.999c0-4.793-2.149-9.334-5.856-12.374z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Samples</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                            {% url 'my_collection_list' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'my_collection_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>Collection</title>
+                                        <g id="icomoon-ignore">
+                                        </g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Collections</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'my_collection_list' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>Collection</title>
+                                        <g id="icomoon-ignore">
+                                        </g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Collections</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                            {% url 'projectList' as the_url %}
+                            {% if the_url in request.get_full_path %}
+                            <a class="element-actif subMenu" href="{% url 'projectList' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #F8F8FF">
+                                        <title>My Projects</title>
+                                        <g id="icomoon-ignore">
+                                        </g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Projects</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% else %}
+                            <a class="element-no-actif subMenu" href="{% url 'projectList' %}" >
+                                <div style="display: flex; align-items: center; height: 30px;">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" style="fill: #898989">
+                                        <title>My Projects</title>
+                                        <g id="icomoon-ignore">
+                                        </g>
+                                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                                    </svg>
+                                    {% if "small" in request.session.menu %}
+                                    <p id="menuText"></p>
+                                    {% else %}
+                                    <p id="menuText">My Projects</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+var submenusStates;
+var arrow1 = document.getElementById('arrowSamplethèque'),
+    arrow2 = document.getElementById('arrowStudio');
+if ('{{request.session.submenu1_state}}' || '{{request.session.submenu2_state}}') {
+    var sampletheque, studio;
+    arrow1.style.transition = '';
+    arrow2.style.transition = '';
+    if ('{{request.session.submenu1_state}}'==='show') {
+        sampletheque=true;
+        arrow1.style.transform = '';
+    } else {
+        sampletheque=false;
+        arrow1.style.transform = 'rotate(180deg)';
+    }
+    if ('{{request.session.submenu2_state}}'==='show') {
+        studio = true;
+        arrow2.style.transform = '';
+    } else {
+        studio = false;
+        arrow2.style.transform = 'rotate(180deg)';
+    }
+    submenusStates = {samplethèque:sampletheque, studio:studio};
+    arrow1.style.transition = 'all 0.5s';
+    arrow2.style.transition = 'all 0.5s';
+} else {
+    submenusStates = {samplethèque:false, studio:false};
+    arrow1.style.transition = '';
+    arrow2.style.transition = '';
+    arrow1.style.transform = 'rotate(180deg)';
+    arrow2.style.transform = 'rotate(180deg)';
+    arrow1.style.transition = 'all 0.5s';
+    arrow2.style.transition = 'all 0.5s';
+}
+
+if ('{% url "sample_list" %}'==='{{request.get_full_path}}' ||'{% url "collection_list" %}'==='{{request.get_full_path}}' ||'{% url "recents" %}'==='{{request.get_full_path}}') {
+    var samplethequeBtn = document.getElementById('samplethèqueBtn');
+    samplethequeBtn.classList.remove('element-no-actif');
+    samplethequeBtn.classList.add('element-actif');
+    samplethequeBtn.style.backgroundColor = 'var(--hover-color)';
+}
+if ('{% url "my_sample_list" %}'==='{{request.get_full_path}}' ||'{% url "my_collection_list" %}'==='{{request.get_full_path}}' || '{% url "projectList" %}'==='{{request.get_full_path}}') {
+    var studioBtn = document.getElementById('studioBtn');
+    studioBtn.classList.remove('element-no-actif');
+    studioBtn.classList.add('element-actif');
+    studioBtn.style.backgroundColor = 'var(--hover-color)';
+}
+
+function switchArrow(e) {
+    if (e.id=="studioBtn") {
+        var arrow = document.getElementById('arrowStudio');
+        submenusStates.studio=!submenusStates.studio;
+        if (submenusStates.studio) {
+            arrow.style.transform = '';
+        }
+        else{
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+    else {
+        var arrow = document.getElementById('arrowSamplethèque');
+        arrow.style.transform ='';
+        submenusStates.samplethèque=!submenusStates.samplethèque;
+        if (submenusStates.samplethèque) {
+            arrow.style.transform = '';
+        }
+        else{
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+    saveSubmenusStates();
+}
+
+function saveSubmenusStates() {
+    
+    let csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    var data = {'submenu1': submenusStates.samplethèque, 'submenu2': submenusStates.studio};
+    fetch('{% url "submenuAPI" %}', {
+        method:'POST',
+        credentials:'same-origin',
+        headers:{
+            "X-Requested-With":"XMLHttpRequest",
+            "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify(data),
+    }).then(r => r.json())
+    .then(data => {})
+}
+</script>

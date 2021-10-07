@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+
+{% block menu_collection %}active{% endblock %}
+
+
+
+
+{% block groupaction %}
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+    <form method="GET" class="form-control" style="background-color: transparent !important; border: none;">
+        <div class="input-group">
+            <div class="btn-group mb-3" role="group" aria-label="Basic radio toggle button group" style="width: 100%;">  
+                {% if macro %}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro" checked/>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio1"  onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio2" onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {%else%}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro"/>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio1" for="btnradio1" onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio2"  onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {% endif %}
+            </div>
+            <div class="input-group mx-auto">
+                <input class="form-control form-control-filter  text-white" placeholder="Sample name, artist or tags ..." type="text" id="id_filter_by_all" name="filter_by_all" value="{{ request.GET.filter }}" style="background-color: var(--btn-outline-color); border-top-right-radius: 0; border-bottom-right-radius: 0; height: 38px;">
+                <div class="position-relative">
+                    <select class="w-100" id='filterAll' name="filter_selection" multiple>
+                        <title></title>
+                        <g id="icomoon-ignore">
+                        </g>
+                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                        </svg>;">
+                        {% if filter_name %}
+                        <option value='name' selected>Name</option>
+                        {% else %}
+                        <option value='name'>Name</option>
+                        {% endif %}
+                        {% if filter_user %}
+                        <option value='artist' selected>Artist</option>
+                        {% else %}
+                        <option value='artist'>Artist</option>
+                        {% endif %}
+                        {% if filter_tag %}
+                        <option value='tags' selected>Tags</option>
+                        {% else %}
+                        <option value='tags' >Tags</option>
+                        {% endif %}
+                    </select>
+                    <script>
+                        document.multiselect('#filterAll');
+                    </script>
+                </div>
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>  
+</div>
+<div class="ms-3">
+    {% if length is not None %}
+        <em>{{ length }} results founds</em>
+    {% endif %}
+</div>
+<div>
+    <div class="btn-toolbar float-end mt-3" role="toolbar" aria-label="collection Toolbar">
+        <div class="btn-group me-3" role="group">
+            <a href="#" id="btn-add-to-my-samples" class="btn btn-outline-secondary btn-outline-secondary-perso d-none">
+                <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg> -->
+                Add to My Samples
+            </a>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop2" type="button" class="btn btn-outline-secondary btn-outline-secondary-perso dropdown-toggle d-none" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                    </svg>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop2">
+                    <li><a id="collection-delete" class="dropdown-item" href="#" style="color: var(--color)">Remove from All Collections</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    {%for collection in collection_list %}
+                    <li><a class="dropdown-item collection-item" href="#" data-id="{{collection.id}}" style="color: var(--color)">Add to {{collection.name}}</span></a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="btn-group me-3" role="group">
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#infoModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-lg" viewBox="0 0 16 16">
+                    <path d="m10.277 5.433-4.031.505-.145.67.794.145c.516.123.619.309.505.824L6.101 13.68c-.34 1.578.186 2.32 1.423 2.32.959 0 2.072-.443 2.577-1.052l.155-.732c-.35.31-.866.434-1.206.434-.485 0-.66-.34-.536-.939l1.763-8.278zm.122-3.673a1.76 1.76 0 1 1-3.52 0 1.76 1.76 0 0 1 3.52 0z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div>
+    {% include "samples/sampleItems/sample_list_item.html" %}
+</div>
+
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Info</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; align-self: center;">
+                    {% if object.image %}
+                    {% thumbnail object.image "150x200" crop="center" as img %}
+                        <img class="collection_image" src="{{img.url}}" width="{{img.width}}" height="{{img.height}}" alt=" " style="border-radius: 7px;">
+                    {% endthumbnail %}
+                    {% else %}
+                    <svg class="bd-placeholder-img" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:7px;">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#868e96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em">No Image</text>
+                    </svg>
+                    {% endif %}
+                    <div style="display: flex;align-items: start; flex-direction: column; margin-left: 2rem;">
+                        <div class="text-center mb-3" style="margin-left: 3rem;">
+                            <h5>Collection "{{object.name}}"</h5>
+                            <h6><em>by {{object.user}}</em></h6>
+                        </div>
+                        <div>
+                            <h6>description :</h6>
+                            <p class="overflow-auto text-break" style="width: 17rem; height: 10rem;">{{object.description}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p class="text-muted" style="margin-right: 8rem;">Created date : {{object.created_date}}</p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js%}
+ <script>
+     function changeMacro(){
+            divsMicro = document.getElementsByClassName("micro");
+            for(var i=0; i<divsMicro.length; i++) {
+                divsMicro[i].classList.add("d-none");
+            }
+            divsMacro = document.getElementsByClassName("macro");
+            for(var i=0; i<divsMacro.length; i++) {
+                divsMacro[i].classList.remove("d-none");
+            }
+            this.checked;
+            document.getElementById("btnradio2").classList.remove("btn-active");
+            document.getElementById("btnradio1").classList.add("btn-active")
+        };
+
+        function changeMicro(){
+            divsMacro = document.getElementsByClassName("macro");
+            for(var i=0; i<divsMacro.length; i++) {
+                divsMacro[i].classList.add("d-none");
+            }
+            divsMicro = document.getElementsByClassName("micro");
+            for(var i=0; i<divsMicro.length; i++) {
+                divsMicro[i].classList.remove("d-none");
+            }
+            this.checked;
+            document.getElementById("btnradio1").classList.remove("btn-active");
+            document.getElementById("btnradio2").classList.add("btn-active")
+        };
+
+    var render = function() {
+        selected_rows = get_selected_rows(btn_required_selected=["btn-add-to-my-samples", "btnGroupDrop2"])
+        
+        if (selected_rows.length > 0)
+        {
+            var query_string = "ids="+selected_rows.toString();
+            set_href("collection",query_string)
+            document.getElementById('btn-add-to-my-samples').setAttribute("href","addToUser?"+query_string);
+        }
+    };
+
+    function selectCard(id){
+        var item=document.getElementById(id);
+        if (item.getAttribute("checked") === "false"){
+            item.style.border= "3px solid ghostwhite";
+            item.style.borderRadius= "7px";
+            item.setAttribute("checked",true);}
+        else{
+            item.classList.remove("select");
+            item.style.border= "none";
+            item.setAttribute("checked",false);
+        }
+        render();
+    }
+
+    function selectTag(sampleId,tagId){
+        console.log(sampleId,tagId);
+    }
+
+   
+
+    init_table_ui("#SampleTable",render);
+
+    
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+  <h1 style="color:var(--color)">La Boite à Sons</h1>
+  <p style="color:var(--color)">Bienvenu sur le site de la boite à sons</p>
+<div class="d-flex justify-content-center">
+  <a href="https://vivrelemonde.fr/" target="_blank">
+  {% if request.session.testTheme %}
+    <img src="{% static 'media/vlm/LOGO_TEXTE_noir.png' %}" style="height: 100px;">
+  {% else %}
+    <img src="{% static 'media/vlm/LOGO_TEXTE_blanc.png' %}" style="height: 100px;">
+  {% endif %}
+  </a>
+  <a href="https://www.enib.fr/" target="_blank"><img src="{% static 'icons/ENIB-cmjn.jpg' %}" style="height: 100px; margin-left: 10px; padding: 13px 20px 15px 19px; background-color: white; border-radius: 9px;"></a>
+</div>
+
+{% endblock %}

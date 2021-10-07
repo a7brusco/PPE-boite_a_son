@@ -1,0 +1,104 @@
+{% load static %}
+{% load thumbnail %}
+
+<div class ="row row-cols-2-sm" >
+    {% for collection in object_list %}
+    <div class="col-lg-6 mx-auto p-3">
+
+        <div class="card mb-3 bg-dark border-secondary" style="width: 100%; height: 300px">
+            <div class="row g-0">
+             <a class="card-button" style="position: absolute; height: 100%; width: 100%; display: inline-block; cursor: pointer;" id="{{collection.id}}" data-id="{{collection.id}}" checked="false" author="{{collection.user}}" onClick='selectCard("{{collection.id}}", "{{user}}")'></a>
+              <div class="col-md-4">
+                {% if collection.image %}
+                    {% thumbnail collection.image "250x298" crop="center" as img %}
+                        <img class="collection_image" src="{{img.url}}" width="100%" height="{{img.height}}" alt=" " style="border-radius: 10px 0 0 10px;">
+                    {% endthumbnail %}
+                {% else %}
+                    <svg class="bd-placeholder-img" xmlns="http://www.w3.org/2000/svg" width="100%" height="298px" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false" style="border-radius:7px 0 0 7px;">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#868e96"></rect>
+                        <text x="50%" y="50%" fill="#dee2e6" dy=".3em">No Image</text>
+                    </svg>
+                {% endif %}
+              </div>
+              <div class="col-md-8">
+                <div class="card-body" style="height: 300px">
+                    <div style="color: ghostwhite;">
+                        <h5 class="card-title">{{collection.name}}
+                            {%if collection.isRecent %}
+                            <span class="badge bg-danger mb-2 ms-2 rounded-pill">New</span>
+                            {%endif%}
+                        </h5>
+                        <h6 class="card-subtitle mb-2">
+                            <em>{{collection.user.username}}</em>
+                            {% if collection.user.id == user.id %}
+                            <span class="badge rounded-pill bg-success">Owner</span>
+                            {% endif %}
+                            {% if not collection.isPublic %}
+                            <span class="badge rounded-pill bg-danger">Private</span>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <div class="mt-1">
+                        <p class="description" style="height: 70px;">{{collection.description}}</p>
+                        <p style="margin-bottom: -15px;"><em>Number of samples : {{collection.samples.all.count}}</p></em>
+                    </div>
+                    <div class="row text-muted mt-5">
+                        <div class="col-8">
+                        <p style="padding-top: 18px; margin: 0">Created date : {{collection.created_date}}</p>
+                        </div>
+                        <div class="col-4">
+                        {% if 'mycollections' in path %}
+                            {% if collection.user.id == user.id %}
+                                <div class="dropdown" style="margin: 0 !important ;">
+                                    <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"  style="padding: 0.1rem; z-index:1 ; position: relative; width: 5rem; height: 35.6px; font-size: 16px; margin-top:10px">
+                                    More
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-card" aria-labelledby="dropdownMenuButton1">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'my_collection_detail' collection.id %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  class="bi bi-collection-play-fill" viewBox="0 0 16 16" style="fill:#898989; margin-right: 5px;">
+                                                <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm6.258-6.437a.5.5 0 0 1 .507.013l4 2.5a.5.5 0 0 1 0 .848l-4 2.5A.5.5 0 0 1 6 12V7a.5.5 0 0 1 .258-.437z"/>
+                                            </svg>
+                                            Detail
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'my_collection_update' collection.id %}">
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" style="fill: #898989; margin-right: 5px;">
+                                                <title></title>
+                                                <g id="icomoon-ignore">
+                                                </g>
+                                                <path d="M432 0c44.182 0 80 35.817 80 80 0 18.010-5.955 34.629-16 48l-32 32-112-112 32-32c13.371-10.045 29.989-16 48-16zM32 368l-32 144 144-32 296-296-112-112-296 296zM357.789 181.789l-224 224-27.578-27.578 224-224 27.578 27.578z"></path>
+                                            </svg>
+                                            Update Information
+                                        </a>
+                                    </li>
+                                    {% if not collection.isPublic %}
+                                    <li>
+                                        <a class="dropdown-item text-danger" onclick="modalDefinitiveDeleteCollection('{{collection.id}}')" style="cursor: pointer;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 5px;">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                            </svg> 
+                                            Delete Completely
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                            <a class="btn btn-primary float-end" href="{% url 'my_collection_detail' collection.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem; margin-top: 10px">More</a>
+                            {% endif %}                            
+                        {% else %}
+                        <a class="btn btn-primary float-end" href="{% url 'collection_detail' collection.id %}" style="padding: 0.3rem; z-index:1 ; position: relative; width: 4rem; margin-top: 10px">More</a>
+                        {% endif %}
+                    </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

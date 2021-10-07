@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block menu_sample %}active{% endblock %}
+
+{% block groupaction %}
+
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+    <form method="GET" class="form-control" style="background-color: transparent !important; border: none;">
+        <div class="input-group">
+            <div class="btn-group mb-3" role="group" aria-label="Basic radio toggle button group" style="width: 100%;">  
+                {% if macro %}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro" checked/>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio1"  onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio2" onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {%else%}
+                <input class="d-none" id="filter_macro" type="radio" name="filter_macro"/>
+                <label class="btn btn-outline-primary shadow-none" id="btnradio1" for="btnradio1" onclick="changeMacro();" style="border-radius: 15px 0 0 15px; height: 30px; padding: 2px 12px">Long Samples</label>
+                <label class="btn btn-outline-primary shadow-none btn-active" id="btnradio2"  onclick="changeMicro();" style="border-radius: 0 15px 15px 0; height: 30px; padding: 2px 12px">Short Samples</label>
+                {% endif %}
+            </div>
+            <div class="input-group mx-auto">
+                <input class="form-control form-control-filter  text-white" placeholder="Sample name, artist or tags ..." type="text" id="id_filter_by_all" name="filter_by_all" value="{{ request.GET.filter }}" style="background-color: var(--btn-outline-color); border-top-right-radius: 0; border-bottom-right-radius: 0; height: 38px;">
+                <div class="position-relative">
+                    <select class="w-100" id='filterAll' name="filter_selection" multiple>
+                        <title></title>
+                        <g id="icomoon-ignore">
+                        </g>
+                        <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                        </svg>;">
+                        {% if filter_name %}
+                        <option value='name' selected>Name</option>
+                        {% else %}
+                        <option value='name'>Name</option>
+                        {% endif %}
+                        {% if filter_user %}
+                        <option value='artist' selected>Artist</option>
+                        {% else %}
+                        <option value='artist'>Artist</option>
+                        {% endif %}
+                        {% if filter_tag %}
+                        <option value='tags' selected>Tags</option>
+                        {% else %}
+                        <option value='tags' >Tags</option>
+                        {% endif %}
+                    </select>
+                    <script>
+                        document.multiselect('#filterAll');
+                    </script>
+                </div>
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>  
+</div>
+<div class="ms-3">
+    {% if length is not None %}
+        <em>{{ length }} results founds</em>
+    {% endif %}
+</div>
+<div>
+    <div class="btn-toolbar mt-3 float-end" role="toolbar" aria-label="sample list toolbar" style="padding: 0 .75rem;"> 
+        <div class="btn-group me-3" role="group">
+            <button type="button" id="btn-add-to-my-samples" class="btn btn-outline-secondary btn-outline-secondary-perso d-none" data-bs-toggle="modal" data-bs-target="#formModal" onclick="sendInfoToModal('{{request.path}}')">
+                <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg> -->
+                Add to My Samples
+            </button>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop2" type="button" class="btn btn-outline-secondary btn-outline-secondary-perso dropdown-toggle d-none" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                    </svg>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop2">
+                    <li><a id="collection-delete" class="dropdown-item" href="#" style="color: var(--color)">Remove from All Collections</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    {%for collection in collection_list %}
+                    <li><a class="dropdown-item collection-item" href="#" data-id="{{collection.id}}" style="color: var(--color)">Add to {{collection.name}}</span></a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <a class="btn btn-outline-secondary btn-outline-secondary-perso" data-bs-toggle="modal" data-bs-target="#formModalCreateSample">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Add Samples To My Samples</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+              <table class="table dataTable-table" id ="SampleSelectedTable" >
+                <thead style="color: var(--color);">
+                    <tr >
+                    <th class="col-1 text-center">Select</th>
+                    <th class="col-2 text-center">Player</th>
+                    <th class="col-3 text-center">Name</th>
+                    <th class="col-1 text-center">Artist</th>
+                    <th class="col-3 text-center">Tags</th>
+                    <th class="col-2 text-center">Last Modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" data-bs-dismiss="modal" onclick="changeDataServer('{{request.path}}')">Add to my Samples</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+
+{% include "samples/sampleItems/modal_sample_create.html" %}
+
+
+{% endblock %}
+
+{% block content %}
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToMySampleToast" class="toast hide toastAddToMySamples" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                This samples are successfully added to your samples ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToast" class="toast hide toastAddToMySamples" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                Your sample has been created ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% include "samples/sampleItems/sample_list_item.html" %}
+
+{% endblock %}
+
+{% block js%}
+<script>
+    SAMPLE_CHOOSEN = null;
+
+    if("{{created}}"==="True"){
+        showToastCreated(); 
+    }
+
+    var render = function() {
+        selected_rows = get_selected_rows(btn_required_selected=["btn-add-to-my-samples", "btnGroupDrop2"]);
+        if (selected_rows.length > 0)
+        {
+            var query_string = "ids="+selected_rows.toString();
+            SAMPLE_CHOOSEN = selected_rows.toString().split(",").map(function(item) {
+            return parseInt(item, 10);});
+            set_href("collection",query_string);
+        }
+        else{
+            SAMPLE_CHOOSEN = null;
+        }
+    };
+
+    init_table_ui("#SampleTable",render);
+    
+</script>
+{% endblock %}

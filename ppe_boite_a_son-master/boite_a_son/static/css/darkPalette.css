@@ -1,0 +1,15 @@
+:root {
+    --primary-color: #212121;
+    --secondary-color: #272727;
+    --border-color:#696969;
+    --color:ghostwhite;
+    --hover-color: #383838;
+    --btn-outline-color: #171717;
+    --btn-outline-hover-color: #444444;
+    --card-color: #212529;
+    --menu-bg-color: #292929;
+    --submenu-bg-color: #303030;
+    --searchbar-menu-color: #313131;
+    --icon-color: #898989;
+    --form-helper : #938A82;
+}

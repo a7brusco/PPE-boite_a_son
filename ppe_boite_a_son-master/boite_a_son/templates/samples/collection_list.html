@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block menu_collection %}active{% endblock %}
+
+
+{% block groupaction %}
+
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+  
+    <form method="GET" class="form-control" style="background-color: transparent !important; border: none;">
+        <div class="input-group mx-auto">
+            <input class="form-control form-control-filter  text-white" placeholder="Sample name or artist ..." type="text" id="id_filter_by_all" name="filter_by_all" value="{{ request.GET.filter }}" style="background-color: var(--btn-outline-color); border-top-right-radius: 0; border-bottom-right-radius: 0; height: 38px;">
+            <div class="position-relative">
+                <select class="w-100" id='filterAll' name="filter_selection" multiple>
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M416 480l96-256h-416l-96 256zM64 192l-64 288v-416h144l64 64h208v64z"></path>
+                    </svg>;">
+                    {% if filter_name %}
+                    <option value='name' selected>Name</option>
+                    {% else %}
+                    <option value='name'>Name</option>
+                    {% endif %}
+                    {% if filter_user %}
+                    <option value='artist' selected>Artist</option>
+                    {% else %}
+                    <option value='artist'>Artist</option>
+                    {% endif %}
+                </select>
+                <script>
+                    document.multiselect('#filterAll');
+                </script>
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>  
+</div>
+<div class="ms-3">
+    {% if length is not None %}
+        <em>{{ length }} results founds</em>
+    {% endif %}
+</div>
+<div>
+    <div class="btn-toolbar mt-3 float-end" role="toolbar" aria-label="collection list toolbar" style="padding: 0 .75rem;"> 
+        <div class="btn-group me-3" role="group">
+            <button type="button" id="btn-add-to-my-collections" class="btn btn-outline-secondary btn-outline-secondary-perso d-none" data-bs-toggle="modal" data-bs-target="#formModal" onclick="sendInfoToModalCollection('{{request.path}}')">
+                <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg> -->
+                Add to My Collections
+            </button>
+        </div>
+        <a class="btn btn-outline-secondary btn-outline-secondary-perso" data-bs-toggle="modal" data-bs-target="#formModalCreateCollection">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Add Samples To My Collections</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body" style="max-height: 50vh; overflow: auto;">
+              <table class="table dataTable-table" id ="CollectionSelectedTable" >
+                <thead style="color: var(--color);">
+                    <tr >
+                    <th class="col-1 text-center">Select</th>
+                    <th class="col-2 text-center">Name</th>
+                    <th class="col-1 text-center">Artist</th>
+                    <th class="col-3 text-center">Nb samples</th>
+                    <th class="col-3 text-center">Description</th>
+                    <th class="col-2 text-center">Last Modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" data-bs-dismiss="modal" onclick="changeDataCollections('{{request.path}}')">Add to my Collections</button>
+          </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formModalCreateCollection" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+      <div class="modal-content" style="background-color: var(--primary-color); color: var(--color)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Create Collection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="formCreate" action="{% url 'collection_create' %}" method="post" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate >
+        {% csrf_token %}
+          <div class="modal-body divCreate">
+                <div class="col-12 mb-3">
+                    <label id="labelNameOfCollection" for="name" class="form-label">Name*</label>
+                    <input type="text" class="form-control" id="nameOfCollectionCreate" required name="name" minlength="4" maxlength="20">
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        This name have less than 4 characters.
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <label id="labelDescriptionOfCollection" for="description" class="form-label">Description*</label>
+                    <textarea class="form-control" id="descriptionOfCollectionCreate" required name="description" minlength="4" maxlength="200" style="resize: none; height: 150px;"></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        This description have less than 4 characters.
+                    </div>
+                </div>
+                <div class="col-12">
+                    <input type="checkbox" class="form-control-input" id="collectionCreateIsPublic" name="isPublic">
+                    <label id="labelNameOfSample" for="collectionCreateIsPublic" class="form-label">Public Collection ? <span class="text-danger">(une fois public la collection ne pourra plus être repassée en privé !)</span></label>
+                </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" type="submit" id="buttonDismissCreateSample">Create Collection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToMyCollectionToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                This collection are successfully added to your collection ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000">
+    <div id="addToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--primary-color);">
+      <div class="toast-body">
+        <div class="row">
+            <div class="col-1">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" style="fill : #5cb85c; width: 1.25em; height: 1.25em">
+                    <title></title>
+                    <g id="icomoon-ignore">
+                    </g>
+                    <path d="M432 64l-240 240-112-112-80 80 192 192 320-320z"></path>
+                </svg>
+            </div>
+            <div class="col-11">
+                Your collection has been created ! 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% include "samples/sampleItems/collection_list_item.html" %}
+
+{% endblock %}
+
+{% block js%}
+ <script>
+     COLLECTION_CHOOSEN = null;
+
+     if("{{created}}"==="True"){
+       showToastCreated(); 
+    }
+
+    var render = function() {
+        selected_rows = get_selected_rows(btn_required_selected=["btn-add-to-my-collections"])
+        
+        if (selected_rows.length > 0)
+        {
+            var query_string = "ids="+selected_rows.toString();
+            COLLECTION_CHOOSEN = selected_rows.toString().split(",").map(function(item) {
+            return parseInt(item, 10);});
+            document.getElementById('btn-add-to-my-collections').setAttribute("href","addToUser?"+query_string);
+        }
+    };
+
+
+    init_table_ui("#CollectionTable",render);
+
+</script>
+{% endblock %}

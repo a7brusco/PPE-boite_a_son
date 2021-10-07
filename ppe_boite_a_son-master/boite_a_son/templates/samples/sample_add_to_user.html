@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block menu_collection %}active{% endblock %}
+
+
+{% block content %}
+    <h2>Add Samples To My Samples</h2>
+        <table class="table" id ="SampleAddToUser" style="color: ghostwhite;">
+            <thead>
+                <tr>
+                <th class="col-1">Select</th>
+                <th class="col-2">Name</th>
+                <th class="col-2">Artist</th>
+                <th class="col-2">Last Modification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in object_list %}
+                <tr>
+                    <td><input class="form-check-input row_selector" type="checkbox" data-id="{{collection.id}}" checked disabled></td>
+                    <td>{{sample.name}}</td>
+                    <td>{{sample.user.username}}</td>
+                    <td>{{sample.created_date}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    <form method="post" action="#">
+    {% csrf_token %}
+    {{ form| crispy }}
+    <input type="submit" class="btn btn-success btn-submit" value="save" />
+    </form>
+    </div>
+{% endblock %}
