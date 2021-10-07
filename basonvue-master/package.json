@@ -1,0 +1,37 @@
+{
+  "name": "api_bason",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.9.2",
+    "@shopify/draggable": "*",
+    "@vueuse/sound": "^1.1.7",
+    "bootstrap": "^5.0.0-beta3",
+    "chart.js": "^3.2.1",
+    "connect-history-api-fallback": "^1.6.0",
+    "core-js": "^3.6.5",
+    "express": "^4.17.1",
+    "howler": "^2.2.1",
+    "tone": "^14.7.77",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0-0",
+    "vue3-spring": "^0.0.2",
+    "vuex": "^4.0.0-0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-vuex": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
